@@ -1,4 +1,7 @@
+//comment this out if running Processing 2
 import processing.opengl.*;
+//----------------------------------------
+
 import intel.pcsdk.*;
 
 boolean trackHand = true;
