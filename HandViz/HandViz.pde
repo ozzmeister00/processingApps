@@ -22,7 +22,7 @@ void setup()
   PXCUPipeline.Init(PXCUPipeline.PXCU_PIPELINE_GESTURE|PXCUPipeline.PXCU_PIPELINE_GESTURE);
   int[] labelMapSize = PXCUPipeline.QueryLabelMapSize();
   labelMap = createImage(labelMapSize[0],labelMapSize[1],RGB);
-  tracked.add(new PVector(0,0,1));
+  tracked.add(new PVector(-10,-10,1));
 
   size(sWidth,sHeight,OPENGL); //use opengl so we can z-order the ellipses
   noStroke();
