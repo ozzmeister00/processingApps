@@ -1,7 +1,9 @@
 PerceptualP5 
 ------------
 Processing Sketches from the Perceptual Computing Lab<br>
-Download the [Perceptual Computing SDK](http://software.intel.com/en-us/vcsource/tools/perceptual-computing-sdk)
+Download the [Perceptual Computing SDK](http://software.intel.com/en-us/vcsource/tools/perceptual-computing-sdk)<br/>
+All samples and source are released under the terms outlined in the Perceptual Computing SDK End-User License Agreement<br/>
+Please refer to intel-pcsdk-beta-eula-121003.txt for more information.  Additional license information provided where applicable.
 
 * HandViz - Hand position and openness tracking/visualizer (processing 1.5.1 and processing 2beta6)
 * FingerFluid - Fingertip tracking and fluid (processing 1.5.1)
