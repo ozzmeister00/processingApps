@@ -9,5 +9,5 @@ Download the [Perceptual Computing SDK](http://software.intel.com/en-us/vcsource
   * requires [GLGraphics](http://glgraphics.sourceforge.net/)
   * Notes: press 'l' to toggle label map background display.  The "fluid curtain" effect needs some work,<br/>if someone wants to fix it up, please do!  Code starts at 'if(curtain)' in the draw() method.
 
-<sub>All samples and source are released under the terms outlined in the <b>Perceptual Computing SDK Pre-Release License Agreement</b><br/>
-Please refer to <b>intel-pcsdk-beta-eula-121003.txt</b> for more information.  Additional license information provided where applicable.</sub>
+<sub><i>All samples and source are released under the terms outlined in the <b>Perceptual Computing SDK Pre-Release License Agreement</b><br/>
+Please refer to <b>intel-pcsdk-beta-eula-121003.txt</b> for more information.  Additional license information provided where applicable.</i></sub>
