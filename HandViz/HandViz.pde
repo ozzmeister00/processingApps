@@ -7,7 +7,7 @@ Copyright(c) 2012 Intel Corporation. All Rights Reserved.
 ******************************************************************************/
 
 //comment this out if running Processing 2
-import processing.opengl.*;
+//import processing.opengl.*;
 //----------------------------------------
 
 import intel.pcsdk.*;
