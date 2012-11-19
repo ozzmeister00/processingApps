@@ -1,6 +1,6 @@
 import intel.pcsdk.*;
 import blobDetection.*;
-import processing.opengl.*;
+//import processing.opengl.*;
 
 boolean drawLabel = false;
 int[] lm = new int[2];

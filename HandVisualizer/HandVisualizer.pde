@@ -15,7 +15,7 @@ private static PImage display, rgbImage, depthImage, irImage, uvImage;
 private static int mode=PXCUPipeline.PXCU_PIPELINE_COLOR_VGA;//PXCU_PIPELINE_GESTURE
 
 boolean fingerTracking = true;
-boolean handTracking = false;
+boolean handTracking = true;
 
 short[] depthMap;
 int[] depth_size;
@@ -177,7 +177,7 @@ void draw() {
     //image(rgbImage, 320, 0);
 
 
-    /*
+    
     //maskDetails
      PXCMGesture.GeoNode hand1MaskDetails = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_MASK_DETAILS);//LABEL_HAND_UPPER);
      if (hand1MaskDetails!=null) {
@@ -188,9 +188,8 @@ void draw() {
      text("   maskDetails", hand1MaskDetails.massCenterImage.x, hand1MaskDetails.massCenterImage.y);
      popStyle();
      }
-     */
+    
     pushMatrix();
-    //scale(2);
 
     if (handTracking) {
       //hand1Fingertip
@@ -214,7 +213,7 @@ void draw() {
         popStyle();
       }
 
-      /*
+      
     //hand1 HandUpper
        PXCMGesture.GeoNode hand1Upper = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_UPPER);//);
        if (hand1Upper!=null) {
@@ -235,7 +234,7 @@ void draw() {
        text("   middle", hand1HandMiddle.positionImage.x, hand1HandMiddle.positionImage.y);
        popStyle();
        }
-       */
+       
     }
 
 
