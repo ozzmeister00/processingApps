@@ -11,7 +11,7 @@ import intel.pcsdk.*; //import the Intel Perceptual Computing SDK
 
 private static PImage labelImage, rgbImage, depthImage, irImage;
 
-private static int mode=PXCUPipeline.PXCU_PIPELINE_COLOR_VGA;//PXCU_PIPELINE_GESTURE
+private static int mode=PXCUPipeline.PXCU_PIPELINE_COLOR_VGA;
 
 short[] depthMap;
 int[] depth_size;
@@ -57,7 +57,7 @@ void setup() {
     print("DepthSize("+depth_size[0]+","+depth_size[1]+")\n");
 
     depthMap = new short[depth_size[0] * depth_size[1]];
-    depthImage=createImage(depth_size[0], depth_size[1], ALPHA);//rgb_size[0], rgb_size[1], RGB);
+    depthImage=createImage(depth_size[0], depth_size[1], ALPHA);
   }
 
 
@@ -69,8 +69,7 @@ void setup() {
   if (ir_size!=null) {
     print("IR Size("+ir_size[0]+","+ir_size[1]+")\n");
     irMap = new short[ir_size[0] * ir_size[1]];
-    //  PXCUPipeline.QueryDepthMap(depthMap);
-    irImage=createImage(ir_size[0], ir_size[1], ALPHA);//rgb_size[0], rgb_size[1], RGB);
+    irImage=createImage(ir_size[0], ir_size[1], ALPHA);
   }
 }
 
@@ -111,5 +110,12 @@ void draw() {
 
     PXCUPipeline.ReleaseFrame();//VERY IMPORTANT TO RELEASE THE FRAME
   }
+}
+
+
+void exit()
+{
+  PXCUPipeline.Close(); 
+  super.exit();
 }
 

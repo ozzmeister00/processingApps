@@ -123,3 +123,9 @@ void draw() {
   }
 }
 
+
+void exit()
+{
+  PXCUPipeline.Close(); 
+  super.exit();
+}
