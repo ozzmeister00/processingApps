@@ -18,8 +18,9 @@ import processing.opengl.*;
 
 boolean hand1Open, hand2Open = false;
 PVector camPos, camRot;
-PVector hand1Point, hand2Point;
+PVector hand1Point, hand2Point, phand1Point, phand2Point;
 PVector grabPoint1, grabPoint2;
+PVector lasthand1, lasthand2;
 
 int openThreshhold = 15;
 PImage display;
@@ -47,12 +48,20 @@ void setup() {
     if (uv_size!=null) print("UVMapSize("+uv_size[0]+","+uv_size[1]+")\n");
   }
   camPos = new PVector(0, 0, 0);
+  camRot = new PVector(0, 0, 0);
   hand1Point = new PVector(0, 0, 0);
+  hand2Point = new PVector(0, 0, 0);
+  phand1Point = new PVector(0, 0, 0);
+  phand2Point = new PVector(0, 0, 0);
+  lasthand1 =  new PVector(0.0,0.0,0.0);
+  lasthand2 =  new PVector(0.0,0.0,0.0);
+      
 }
 
 void draw() { 
   background(0);
-
+openThreshhold = mouseX;
+println(openThreshhold);
   if (PXCUPipeline.AcquireFrame(true)) {
     PXCUPipeline.QueryLabelMapAsImage(display);
 
@@ -79,6 +88,7 @@ void draw() {
     PXCMGesture.GeoNode hand2 = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY);
 
 
+    //Finger counting
     hand1FingerCount = 0;
     hand2FingerCount = 0;
     if (hand1Thumb != null) hand1FingerCount++; 
@@ -102,13 +112,16 @@ void draw() {
     
     //Checking Hand1 to see if it's open and on screen
     if (hand1 != null) {
-      if (hand1.openness > openThreshhold) {
+      if (hand1.openness > openThreshhold || hand1Open) {
         fill(0, 255, 50, 200);
       } 
       else {
         fill(255, 50, 50, 200);
       }
+      
       ellipse(map(hand1.positionWorld.x, range.x, -range.x, 0, width), map(hand1.positionWorld.z, range.y, -range.y, 0, height), map(hand1.positionWorld.y, -range.z, range.z, 1, 50), map(hand1.positionWorld.y, -range.z, range.z, 1, 50));
+     
+     
       if (hand1.openness > openThreshhold) {
         hand1Open = true;
       } 
@@ -125,15 +138,10 @@ void draw() {
     }
     
     
+    
+    
     //Checking Hand2 to see if it's open and on screen
-    if (hand2!= null) {
-      if (hand2.openness > openThreshhold) {
-        hand2Open = true;
-      } 
-      else {
-        hand2Open = false;
-      }
-      
+    if (hand2!= null) {  
       //Check to see if hand is open or not, color cursor accordingly
       if (hand2.openness > openThreshhold) {
         fill(0, 255, 50, 200);
@@ -142,8 +150,15 @@ void draw() {
         fill(255, 50, 50, 200);
       }
       ellipse(map(hand2.positionWorld.x, range.x, -range.x, 0, width), map(hand2.positionWorld.z, range.y, -range.y, 0, height), map(hand2.positionWorld.y, -range.z, range.z, 1, 50), map(hand2.positionWorld.y, -range.z, range.z, 1, 50));
+     
+      if (hand2.openness > openThreshhold) {
+        hand2Open = true;
+      } 
+      else {
+        hand2Open = false;
+      }
 
-      if(hand2.positionWorld.x > range.x || hand2.positionWorld.x < -range.x || hand2.positionWorld.z > range.y || hand2.positionWorld.z < -range.y || hand2.positionWorld.y > range.z || hand2.positionWorld.y < -range.z) hand2Open = true;
+      if(hand2.positionWorld.x > range.x || hand2.positionWorld.x < -range.x) hand2Open = true;
   
   }
     else {
@@ -163,10 +178,10 @@ void draw() {
       hand1Point = new PVector(hand1.positionWorld.x*movementAmt, hand1.positionWorld.z*movementAmt, hand1.positionWorld.y*-movementAmt);
     }
 
-    if (!hand1Open && grabPoint1 ==null) {
+    if (!hand1Open && grabPoint1 ==null && hand2Open) {
       grabPoint1 = hand1Point;
     }
-    if (!hand1Open ) {
+    if (!hand1Open && hand2Open) { //if (!hand1Open ) {
       camPos.x += (hand1.positionWorld.x*movementAmt)-grabPoint1.x;
       camPos.y += (hand1.positionWorld.z*movementAmt)-grabPoint1.y;
       camPos.z += (hand1.positionWorld.y*-movementAmt)-grabPoint1.z;
@@ -182,10 +197,10 @@ void draw() {
       hand2Point = new PVector(hand2.positionWorld.x*movementAmt, hand2.positionWorld.z*movementAmt, hand2.positionWorld.y*-movementAmt);
     }
 
-    if (!hand2Open && grabPoint2 ==null) {
+    if (!hand2Open && grabPoint2 ==null && hand1Open) {
       grabPoint2 = hand2Point;
     }
-    if (!hand2Open ) {
+    if (!hand2Open && hand1Open) {
       camPos.x += (hand2.positionWorld.x*movementAmt)-grabPoint2.x;
       camPos.y += (hand2.positionWorld.z*movementAmt)-grabPoint2.y;
       camPos.z += (hand2.positionWorld.y*-movementAmt)-grabPoint2.z;
@@ -201,10 +216,46 @@ void draw() {
 
 
 
-
-    if (hand1Open && hand2Open) {
-      //insert rotation code here
+//Both Hand Rotation Tracking
+        if (hand1 != null && hand2 !=null) {
+      hand1Point = new PVector(hand1.positionWorld.x*movementAmt, hand1.positionWorld.z*movementAmt, hand1.positionWorld.y*-movementAmt);
+      hand2Point = new PVector(hand2.positionWorld.x*movementAmt, hand2.positionWorld.z*movementAmt, hand2.positionWorld.y*-movementAmt);
+ 
     }
+
+    if (!hand2Open && grabPoint2 ==null && !hand1Open && grabPoint1 ==null) {
+      grabPoint1 = hand1Point;
+      grabPoint2 = hand2Point;
+    }
+    
+    if (!hand2Open && !hand1Open && hand1 != null && hand2 !=null) {
+
+
+      //change rotation of camera
+    //  float whatever = (hand1.positionWorld.x*movementAmt);
+   //   println((hand1.positionWorld.x*movementAmt)-grabPoint1.x);
+      /*
+      lasthand1.x += (hand1.positionWorld.x*movementAmt)-grabPoint1.x;
+      lasthand1.y += (hand1.positionWorld.z*movementAmt)-grabPoint1.y;
+      lasthand1.z += (hand1.positionWorld.y*-movementAmt)-grabPoint1.z;
+      
+      lasthand2.x += (hand2.positionWorld.x*movementAmt)-grabPoint2.x;
+      lasthand2.y += (hand2.positionWorld.z*movementAmt)-grabPoint2.y;
+      lasthand2.z += (hand2.positionWorld.y*-movementAmt)-grabPoint2.z;
+      */
+       //     camRot.x = mouseX;
+     // camRot.y += ((hand2.positionWorld.z*movementAmt)-grabPoint2.z)-((hand1.positionWorld.z*movementAmt)-grabPoint1.z);
+      //camRot.z += ((hand2.positionWorld.y*movementAmt)-grabPoint2.y)-((hand1.positionWorld.y*movementAmt)-grabPoint1.y);
+
+
+      grabPoint1 =  hand1Point;
+      grabPoint2 =  hand2Point;
+    }
+    if (hand1Open && hand2Open) {
+      grabPoint1 = null;
+      grabPoint2 = null;
+    }
+
 
     /*
       //Drawing the fingertips on screen
@@ -271,14 +322,17 @@ void draw() {
   beginCamera();
   camera();
   translate(camPos.x, camPos.y, camPos.z);
+  rotate(degrees(camRot.x));
   endCamera();
+
+int boxSpacing = 300;
 
   for (int x =0;x< 10;x++) {
     for (int y =0;y< 10;y++) {
       for (int z =0;z< 10;z++) {
         fill(x*25, y*25, 255-(z*25), 200);
         pushMatrix();
-        translate(x*300, y*300, z*-300);
+        translate(x*boxSpacing, y*boxSpacing, z*-boxSpacing);
         box(45);
         popMatrix();
       }
