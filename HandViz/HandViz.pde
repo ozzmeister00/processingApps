@@ -7,7 +7,7 @@ Copyright(c) 2012 Intel Corporation. All Rights Reserved.
 ******************************************************************************/
 
 //comment this out if running Processing 2
-//import processing.opengl.*;
+import processing.opengl.*;
 //----------------------------------------
 
 import intel.pcsdk.*;
@@ -32,7 +32,7 @@ void setup()
   labelMap = createImage(labelMapSize[0],labelMapSize[1],RGB);
   tracked.add(new PVector(-10,-10,1));
 
-  size(sWidth,sHeight,OPENGL); //use opengl so we can z-order the ellipses
+  size(sWidth,sHeight, OPENGL); //use opengl so we can z-order the ellipses
   noStroke();
   background(0);
 }

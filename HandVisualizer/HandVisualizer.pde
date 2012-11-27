@@ -26,57 +26,38 @@ int[] ir_size;
 float[] uvMap;
 int[] uv_size;
 
-void blah() //example in bitwise operations
-{
-  int mybits = 0;
-
-  // to set a bit
-
-  mybits = mybits | 0x0800;
-
-  //to clear a bit
-  mybits = mybits & (~0x0800);//flips every bit
-
-  // to check a bit
-  if ((mybits & 0x0800) != 0)
-  {
-  }
-}
-
 void setup() {
-  size(1280, 480);
+  size(640, 480);
   mode=PXCUPipeline.PXCU_PIPELINE_GESTURE; //
   if (!PXCUPipeline.Init(mode)) {
     print("Failed to initialize PXCUPipeline\n");
     exit();
   }
 
-  //if ((mode&PXCUPipeline.PXCU_PIPELINE_GESTURE)!=0) {
   int[] lm_size=PXCUPipeline.QueryDepthMapSize();//QueryLabelMapSize();
   if (lm_size!=null) {
     print("LabelMapSize("+lm_size[0]+","+lm_size[1]+")\n");
     display=createImage(lm_size[0], lm_size[1], RGB);
-    //rgbImage=createImage(lm_size[0], lm_size[1], RGB);
   }
 
   int[] uv_size=PXCUPipeline.QueryUVMapSize();
   if (uv_size!=null) print("UVMapSize("+uv_size[0]+","+uv_size[1]+")\n");
-  //} 
 
 
 
-  mode=PXCUPipeline.PXCU_PIPELINE_COLOR_VGA; //PXCU_PIPELINE_GESTURE;
+
+  mode=PXCUPipeline.PXCU_PIPELINE_COLOR_VGA; 
   PXCUPipeline.Init(mode);
 
   int[] rgb_size=PXCUPipeline.QueryRGBSize();
   println("querying RGBSize");
   if (rgb_size!=null) {
     print("RGBSize("+rgb_size[0]+","+rgb_size[1]+")\n");
-    rgbImage=createImage(rgb_size[0], rgb_size[1], RGB);//rgb_size[0], rgb_size[1], RGB);
+    rgbImage=createImage(rgb_size[0], rgb_size[1], RGB);
   }
 
 
-  mode=PXCUPipeline.PXCU_PIPELINE_DEPTH_VGA; //PXCU_PIPELINE_GESTURE;
+  mode=PXCUPipeline.PXCU_PIPELINE_DEPTH_VGA;
 
   PXCUPipeline.Init(mode);
 
@@ -86,14 +67,13 @@ void setup() {
     print("DepthSize("+depth_size[0]+","+depth_size[1]+")\n");
 
     depthMap = new short[depth_size[0] * depth_size[1]];
-    //  PXCUPipeline.QueryDepthMap(depthMap);
-    depthImage=createImage(depth_size[0], depth_size[1], ALPHA);//rgb_size[0], rgb_size[1], RGB);
-  }
-  
-  
-  //GRAB IR CAMERA IMAGE
-  mode=PXCUPipeline.PXCU_PIPELINE_CAPTURE; //PXCU_PIPELINE_GESTURE;
 
+    depthImage=createImage(depth_size[0], depth_size[1], ALPHA);
+  }
+
+
+  //GRAB IR CAMERA IMAGE
+  mode=PXCUPipeline.PXCU_PIPELINE_CAPTURE; 
   PXCUPipeline.Init(mode);
 
   ir_size=PXCUPipeline.QueryIRMapSize();
@@ -102,14 +82,11 @@ void setup() {
     print("IR Size("+ir_size[0]+","+ir_size[1]+")\n");
 
     irMap = new short[ir_size[0] * ir_size[1]];
-    //  PXCUPipeline.QueryDepthMap(depthMap);
-    irImage=createImage(ir_size[0], ir_size[1], ALPHA);//rgb_size[0], rgb_size[1], RGB);
+    irImage=createImage(ir_size[0], ir_size[1], ALPHA);
   }
-  
-    //GRAB UV MAP 
-    
-  mode=PXCUPipeline.PXCU_PIPELINE_DEPTH_VGA; //PXCU_PIPELINE_GESTURE;
 
+  //GRAB UV MAP 
+  mode=PXCUPipeline.PXCU_PIPELINE_DEPTH_VGA; 
   PXCUPipeline.Init(mode);
 
   uv_size=PXCUPipeline.QueryUVMapSize();
@@ -118,12 +95,9 @@ void setup() {
     print("UV Size("+uv_size[0]+","+uv_size[1]+")\n");
 
     uvMap = new float[uv_size[0] * uv_size[1]*4];
-    
-    uvImage=createImage(uv_size[0], uv_size[1], ARGB);//rgb_size[0], rgb_size[1], RGB);
+
+    uvImage=createImage(uv_size[0], uv_size[1], ARGB);
   }
-  
-  
-  
 }
 
 void draw() { 
@@ -132,12 +106,8 @@ void draw() {
   if (PXCUPipeline.AcquireFrame(true)) { //if this is set to false it flashes
     float[] acc=new float[3];
     PXCUPipeline.QueryDeviceProperty(PXCMCapture.Device.PROPERTY_ACCELEROMETER_READING, acc);
-    //print ("acc: "+acc[0]+","+acc[1]+","+acc[2]+"\n");   
 
-    // if ((mode&PXCUPipeline.PXCU_PIPELINE_GESTURE)!=0) {
-    if (PXCUPipeline.QueryLabelMapAsImage(display)) image(display, 0, 0);//, 640, 480);
-    // } 
-    // else {
+    if (PXCUPipeline.QueryLabelMapAsImage(display)) image(display, 0, 0);
     if (PXCUPipeline.QueryRGB(rgbImage)) image(rgbImage, 320, 0, 320, 240);
 
 
@@ -149,7 +119,7 @@ void draw() {
     }
     depthImage.updatePixels();
     image(depthImage, 0, 240, 320, 240);
-    
+
 
     //REMAPPING THE IR IMAGE TO A PIMAGE
     PXCUPipeline.QueryIRMap(irMap);
@@ -159,41 +129,24 @@ void draw() {
     }
     irImage.updatePixels();
     image(irImage, 320, 240, 320, 240);
-    
-    /*
-    //REMAPPING THE UV IMAGE TO A PIMAGE
-    PXCUPipeline.QueryUVMap(uvMap);
-    
-    uvImage.loadPixels();
-    for (int i = 0; i < mouseX; i++) { //(uv_size[0]*uv_size[1])-1
-      uvImage.pixels[i] = color(map(uvMap[i], 0, 4000, 0, 255));
-    }
-    uvImage.updatePixels();
-    image(uvImage, 320, 240, 320, 240);
-    
-    println(mouseX + "  :  " + uvMap[mouseX]);
-    */
-    //  }
-    //image(rgbImage, 320, 0);
 
 
-    
     //maskDetails
-     PXCMGesture.GeoNode hand1MaskDetails = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_MASK_DETAILS);//LABEL_HAND_UPPER);
-     if (hand1MaskDetails!=null) {
-     
-     pushStyle();
-     fill(255, 0, 0);
-     ellipse(hand1MaskDetails.massCenterImage.x, hand1MaskDetails.massCenterImage.y, 15, 15);
-     text("   maskDetails", hand1MaskDetails.massCenterImage.x, hand1MaskDetails.massCenterImage.y);
-     popStyle();
-     }
-    
+    PXCMGesture.GeoNode hand1MaskDetails = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_MASK_DETAILS);
+    if (hand1MaskDetails!=null) {
+
+      pushStyle();
+      fill(255, 0, 0);
+      ellipse(hand1MaskDetails.massCenterImage.x, hand1MaskDetails.massCenterImage.y, 15, 15);
+      text("   maskDetails", hand1MaskDetails.massCenterImage.x, hand1MaskDetails.massCenterImage.y);
+      popStyle();
+    }
+
     pushMatrix();
 
     if (handTracking) {
       //hand1Fingertip
-      PXCMGesture.GeoNode hand1Fingertip = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_FINGERTIP);//LABEL_HAND_UPPER);
+      PXCMGesture.GeoNode hand1Fingertip = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_FINGERTIP);
       if (hand1Fingertip!=null) {
 
         pushStyle();
@@ -203,7 +156,7 @@ void draw() {
         popStyle();
       }
 
-      PXCMGesture.GeoNode hand2Fingertip = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_HAND_FINGERTIP);//LABEL_HAND_UPPER);
+      PXCMGesture.GeoNode hand2Fingertip = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_HAND_FINGERTIP);
       if (hand2Fingertip!=null) {
 
         pushStyle();
@@ -213,28 +166,27 @@ void draw() {
         popStyle();
       }
 
-      
-    //hand1 HandUpper
-       PXCMGesture.GeoNode hand1Upper = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_UPPER);//);
-       if (hand1Upper!=null) {
-       
-       pushStyle();
-       fill(255, 0, 0);
-       ellipse(hand1Upper.positionImage.x, hand1Upper.positionImage.y, 15, 15);
-       text("   upper", hand1Upper.positionImage.x, hand1Upper.positionImage.y);
-       popStyle();
-       }
-       //hand1Middle
-       PXCMGesture.GeoNode hand1HandMiddle = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_MIDDLE);//);
-       if (hand1HandMiddle!=null) {
-       
-       pushStyle();
-       fill(255, 0, 0);
-       ellipse(hand1HandMiddle.positionImage.x, hand1HandMiddle.positionImage.y, 15, 15);
-       text("   middle", hand1HandMiddle.positionImage.x, hand1HandMiddle.positionImage.y);
-       popStyle();
-       }
-       
+
+      //hand1 HandUpper
+      PXCMGesture.GeoNode hand1Upper = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_UPPER);
+      if (hand1Upper!=null) {
+
+        pushStyle();
+        fill(255, 0, 0);
+        ellipse(hand1Upper.positionImage.x, hand1Upper.positionImage.y, 15, 15);
+        text("   upper", hand1Upper.positionImage.x, hand1Upper.positionImage.y);
+        popStyle();
+      }
+      //hand1Middle
+      PXCMGesture.GeoNode hand1HandMiddle = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_MIDDLE);
+      if (hand1HandMiddle!=null) {
+
+        pushStyle();
+        fill(255, 0, 0);
+        ellipse(hand1HandMiddle.positionImage.x, hand1HandMiddle.positionImage.y, 15, 15);
+        text("   middle", hand1HandMiddle.positionImage.x, hand1HandMiddle.positionImage.y);
+        popStyle();
+      }
     }
 
 
@@ -245,7 +197,7 @@ void draw() {
 
       //FINGER TRACKING
       //hand1Thumb
-      PXCMGesture.GeoNode hand1Thumb = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB);//);
+      PXCMGesture.GeoNode hand1Thumb = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB);
       if (hand1Thumb!=null) {
 
         pushStyle();
@@ -256,7 +208,7 @@ void draw() {
       }
 
       //hand1Index
-      PXCMGesture.GeoNode hand1Index = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX);//);
+      PXCMGesture.GeoNode hand1Index = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX);
       if (hand1Index!=null) {
 
         pushStyle();
@@ -267,7 +219,7 @@ void draw() {
       }
 
       //hand1Middle
-      PXCMGesture.GeoNode hand1Middle = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE);//);
+      PXCMGesture.GeoNode hand1Middle = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE);
       if (hand1Middle!=null) {
 
         pushStyle();
@@ -278,7 +230,7 @@ void draw() {
       }
 
       //hand1Ring
-      PXCMGesture.GeoNode hand1Ring = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_RING);//);
+      PXCMGesture.GeoNode hand1Ring = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_RING);
       if (hand1Ring!=null) {
         pushStyle();
         fill(255, 100, 25);
@@ -289,7 +241,7 @@ void draw() {
 
 
       //hand1Pinky
-      PXCMGesture.GeoNode hand1Pinky = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY);//);
+      PXCMGesture.GeoNode hand1Pinky = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY);
       if (hand1Pinky!=null) {
         pushStyle();
         fill(255, 100, 25);
@@ -303,7 +255,7 @@ void draw() {
 
       //FINGER TRACKING
       //hand2Thumb
-      PXCMGesture.GeoNode hand2Thumb = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB);//);
+      PXCMGesture.GeoNode hand2Thumb = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB);
       if (hand2Thumb!=null) {
 
         pushStyle();
@@ -314,7 +266,7 @@ void draw() {
       }
 
       //hand2Index
-      PXCMGesture.GeoNode hand2Index = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX);//);
+      PXCMGesture.GeoNode hand2Index = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX);
       if (hand2Index!=null) {
 
         pushStyle();
@@ -325,7 +277,7 @@ void draw() {
       }
 
       //hand2Middle
-      PXCMGesture.GeoNode hand2Middle = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE);//);
+      PXCMGesture.GeoNode hand2Middle = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE);
       if (hand2Middle!=null) {
 
         pushStyle();
@@ -336,7 +288,7 @@ void draw() {
       }
 
       //hand2Ring
-      PXCMGesture.GeoNode hand2Ring = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_RING);//);
+      PXCMGesture.GeoNode hand2Ring = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_RING);
       if (hand2Ring!=null) {
         pushStyle();
         fill(255, 100, 25);
@@ -347,7 +299,7 @@ void draw() {
 
 
       //hand2Pinky
-      PXCMGesture.GeoNode hand2Pinky = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY);//);
+      PXCMGesture.GeoNode hand2Pinky = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY);
       if (hand2Pinky!=null) {
         pushStyle();
         fill(255, 100, 25);
@@ -357,16 +309,6 @@ void draw() {
       }
     }
 
-    /*
-      PXCMGesture.GeoNode ndata2 = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_HAND_UPPER);
-     if (ndata2!=null){
-     print("node: "+ndata2.positionImage+"\n");
-     pushStyle();
-     fill(0,0,255);
-     ellipse(ndata2.positionImage.x, ndata2.positionImage.y, 25, 25);
-     popStyle();
-     }
-     */
     PXCMGesture.Gesture gdata=PXCUPipeline.QueryGesture(PXCMGesture.GeoNode.LABEL_ANY);
     if (gdata!=null) print("gesture "+gdata.label+"\n");
 
@@ -383,5 +325,11 @@ void draw() {
     PXCUPipeline.ReleaseFrame();
     popMatrix();
   }
+}
+
+void exit()
+{
+  PXCUPipeline.Close(); 
+  super.exit();
 }
 
