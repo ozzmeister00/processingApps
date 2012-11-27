@@ -17,14 +17,16 @@ import diewald_fluid.Fluid2D_GPU;
 
 import intel.pcsdk.*;
 
-PGraphics bkg;
+PXCUPipeline session;
+PImage bkg;
 boolean curtain = false;
 boolean drawLabel = true;
-int fX = 160;
-int fY = 120;
-int cS = 4;
+int fX = 320;
+int fY = 240;
+int cS = 2;
 int _w = fX*cS;
 int _h = fY*cS;
+short[] depth;
 
 Fluid2D fluid;
 
@@ -42,19 +44,21 @@ ArrayList<PVector> positions = new ArrayList();
 ArrayList<PVector> oldPos = new ArrayList();
 void setup()
 {
+  session = new PXCUPipeline(this);
   size(640, 480, GLConstants.GLGRAPHICS);
   noStroke();
   
-  if (!PXCUPipeline.Init(PXCUPipeline.PXCU_PIPELINE_GESTURE))
+  if (!session.Init(PXCUPipeline.GESTURE|PXCUPipeline.DEPTH_QVGA))
   {
     print("Failed to initialize PXCUPipeline\n");
     exit();
   }
   fluid = createFluidSolver();
-  int[] lm_size=PXCUPipeline.QueryLabelMapSize();
+  int[] lm_size=session.QueryDepthMapSize();
   if (lm_size!=null)
   {
-    bkg = createGraphics(lm_size[0], lm_size[1], JAVA2D);
+    bkg = createImage(lm_size[0], lm_size[1], RGB);
+    depth = new short[lm_size[0]*lm_size[1]];
   }
   int labels = tipLabels.length;
   for(int i=0;i<labels;i++)
@@ -67,14 +71,27 @@ void setup()
 void draw()
 { 
   background(0);
-  if (PXCUPipeline.AcquireFrame(true))
+  if (session.AcquireFrame(true))
   {
+    session.QueryDepthMap(depth);
+    if(depth!=null)
+    {
+      bkg.loadPixels();
+      for(int p=0;p<depth.length;p++)
+      {
+        int t = 255-(int)(constrain(map(depth[p],0,1000,0,255),0,255));
+        bkg.pixels[p] = color(t,t,t);
+      }
+      bkg.updatePixels();
+    }
     for(int i=0;i<tipLabels.length;i++)
     {
-      PXCMGesture.GeoNode node = PXCUPipeline.QueryGeoNode(tipLabels[i]);
+      PXCMGesture.GeoNode node = session.QueryGeoNode(tipLabels[i]);
       if(node!=null)
       {
-        positions.set(i,new PVector(node.positionImage.x,node.positionImage.y));
+        positions.set(i,new PVector(node.positionImage.x,node.positionImage.y,node.positionWorld.y));
+        if(keyPressed)
+          println(node.positionWorld.y);
       }
       else
       {
@@ -115,41 +132,31 @@ void draw()
     }
     else
     {
-      if(drawLabel)
-        PXCUPipeline.QueryLabelMapAsImage(bkg);
-      bkg.beginDraw();
-      if(!drawLabel)
-        bkg.background(0);
       for(int p=0;p<positions.size();p++)
       {
         PVector ft = (PVector)positions.get(p);
         if(ft.x>=0&&ft.y>=0)
         {
-          bkg.pushStyle();
-          bkg.fill(148,184,34);
-          bkg.ellipse(ft.x,ft.y,10,10);
-          bkg.popStyle();
-          float r = map(ft.x,0,320,0,1);
-          float b = map(ft.y,0,240,0,1);          
-          setDens(fluid,(int)ft.x*2,(int)ft.y*2,4,4,r,.5,b);
-          setVel(fluid,(int)ft.x*2,(int)ft.y*2,4,4,0,-.25);
+          float r = map(ft.x,0,320,0,.25);
+          float b = map(ft.y,0,240,0,.25);
+          if(ft.z>0.5)
+            setDens(fluid,(int)ft.x*2,(int)ft.y*2,16,16,r,.125,b);
+          setVel(fluid,(int)ft.x*2,(int)ft.y*2,4,4,0,-.75);
         }
       }
-      bkg.endDraw();
     }
     fluid.setTextureBackground(bkg);      
     fluid.update();
     image(fluid.getDensityMap(),0,0,640,480);
-    PXCUPipeline.ReleaseFrame();
+    session.ReleaseFrame();
   }
 }
 
-void keyPressed()
+void stop()
 {
-  if(key=='l')
-    drawLabel=!drawLabel;
+  super.stop();
+  session.Close();
 }
-
 void setDens(Fluid2D fluid2d, int x, int y, int sizex, int sizey, float r, float g, float b)
 {
   for (int y1 = 0; y1 < sizey; y1++)
