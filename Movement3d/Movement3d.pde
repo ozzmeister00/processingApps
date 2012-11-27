@@ -60,7 +60,7 @@ void setup() {
 
 void draw() { 
   background(0);
-openThreshhold = mouseX;
+
 println(openThreshhold);
   if (PXCUPipeline.AcquireFrame(true)) {
     PXCUPipeline.QueryLabelMapAsImage(display);
