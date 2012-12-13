@@ -19,6 +19,9 @@ Download [processing](http://processing.org)</b>
   * requires [v3ga Blob Detection](http://www.v3ga.net/processing/BlobDetection/)
   * requires [fisica](http://www.ricardmarxer.com/fisica/)
   * Notes: Needs better polygon creation routines, any takers?
+* <b>SimplePointCloud</b> - Simple RGB point cloud with some debug draw ([Seth](http://twitter.com/djTomServo))
+  * Press 'c' to toggle RGB image
+  * Press 'd' to toggle wire box
 * <b>PanZoomRotate</b> - Basic Panning, Rotation and Zooming in 2D (Ratko Jagodic)
   * Pan - grab with one hand and move around, release to stop panning
   * Zoom - grab with two hands and move them apart, zooming happens around the centerpoint between the two hands
