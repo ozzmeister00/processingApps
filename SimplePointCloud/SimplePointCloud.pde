@@ -6,6 +6,7 @@ int sHeight = 480;
 int maxDepth = 900;
 boolean debug=true;
 boolean drawRGB=true;
+boolean rgbPts=true;
 short[] depthMap;
 int[] depthMapSize;
 PImage colorImage;
@@ -61,7 +62,9 @@ void draw()
         if(depthMap[i_p]<maxDepth)
         {
           pushStyle();
-          color fc = getColorFromDepth(x,y); 
+          color fc = color(0,255,0);
+          if(rgbPts)
+            fc = getColorFromDepth(x,y);
           stroke(fc);
           pushMatrix();
           translate(0,0,-500);
@@ -88,6 +91,8 @@ void keyPressed()
   {
     debug=!debug;
   }
+  if(key=='p')
+    rgbPts=!rgbPts;
 }
 
 color getColorFromDepth(int px, int py)
