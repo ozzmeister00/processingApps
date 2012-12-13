@@ -22,6 +22,7 @@ Download [processing](http://processing.org)</b>
 * <b>SimplePointCloud</b> - Simple RGB point cloud with some debug draw ([Seth](http://twitter.com/djTomServo))
   * Press 'c' to toggle RGB image
   * Press 'd' to toggle wire box
+  * Press 'r' to toggle RGB points
 * <b>PanZoomRotate</b> - Basic Panning, Rotation and Zooming in 2D (Ratko Jagodic)
   * Pan - grab with one hand and move around, release to stop panning
   * Zoom - grab with two hands and move them apart, zooming happens around the centerpoint between the two hands
