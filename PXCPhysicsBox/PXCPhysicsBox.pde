@@ -1,3 +1,13 @@
+/*******************************************************************************
+ 
+ INTEL CORPORATION PROPRIETARY INFORMATION
+ This software is supplied under the terms of a license agreement or nondisclosure
+ agreement with Intel Corporation and may not be copied or disclosed except in
+ accordance with the terms of that agreement
+ Copyright(c) 2012 Intel Corporation. All Rights Reserved.
+ 
+ *******************************************************************************/
+ 
 //import processing.opengl.*;
 
 import intel.pcsdk.*;
@@ -49,7 +59,7 @@ void draw()
   if(session.QueryLabelMapAsImage(labelMap))
   {
     session.QueryDepthMap(depth);
-    for(int p=0;
+    //for(int p=0;
     //image(labelMap,0,0);
     blobDetector.computeBlobs(labelMap.pixels);
     Blob current;

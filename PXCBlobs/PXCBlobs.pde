@@ -1,3 +1,13 @@
+/*******************************************************************************
+ 
+ INTEL CORPORATION PROPRIETARY INFORMATION
+ This software is supplied under the terms of a license agreement or nondisclosure
+ agreement with Intel Corporation and may not be copied or disclosed except in
+ accordance with the terms of that agreement
+ Copyright(c) 2012 Intel Corporation. All Rights Reserved.
+ 
+ *******************************************************************************/
+
 import intel.pcsdk.*;
 import blobDetection.*;
 //import processing.opengl.*;
@@ -6,13 +16,15 @@ boolean drawLabel = false;
 int[] lm = new int[2];
 PImage labelMap;
 BlobDetection blobDetector;
-
+PXCUPipeline session;
 void setup()
 {
   size(640,480,OPENGL);
+  session = new PXCUPipeline(this);
   
-  PXCUPipeline.Init(PXCUPipeline.PXCU_PIPELINE_GESTURE);
-  lm = PXCUPipeline.QueryLabelMapSize();
+  if(!session.Init(PXCUPipeline.GESTURE))
+    exit();
+  lm = session.QueryLabelMapSize();
   labelMap = createImage(lm[0],lm[1],RGB);
   noFill();
   blobDetector = new BlobDetection(lm[0], lm[1]);  
@@ -23,13 +35,13 @@ void setup()
 
 void draw()
 {
-  if(!PXCUPipeline.AcquireFrame(true))
+  if(!session.AcquireFrame(true))
     return;
   pushStyle();
   fill(0,16);
   rect(0,0,width,height);
   popStyle();
-  if(PXCUPipeline.QueryLabelMapAsImage(labelMap))
+  if(session.QueryLabelMapAsImage(labelMap))
   {
     pushMatrix();
     scale(2);
@@ -58,13 +70,7 @@ void draw()
     }
     popMatrix();
   }
-  PXCUPipeline.ReleaseFrame();
-}
-
-void stop()
-{
-  super.stop();
-  PXCUPipeline.Close();
+  session.ReleaseFrame();
 }
 
 void keyPressed()

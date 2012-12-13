@@ -9,59 +9,44 @@
  *******************************************************************************/
 import intel.pcsdk.*;
 
-private static PImage display, rgbImage, depthImage, irImage, uvImage;
-
-
-private static int mode=PXCUPipeline.PXCU_PIPELINE_COLOR_VGA;//PXCU_PIPELINE_GESTURE
-
 boolean fingerTracking = true;
 boolean handTracking = true;
-
 short[] depthMap;
-int[] depth_size;
-
 short[] irMap;
+int[] depth_size;
 int[] ir_size;
-
-float[] uvMap;
 int[] uv_size;
+float[] uvMap;
+private static PImage display, rgbImage, depthImage, irImage, uvImage;
+PXCUPipeline session;
 
 void setup() {
   size(640, 480);
-  mode=PXCUPipeline.PXCU_PIPELINE_GESTURE; //
-  if (!PXCUPipeline.Init(mode)) {
+  session = new PXCUPipeline(this);
+
+  if (!session.Init(PXCUPipeline.GESTURE|PXCUPipeline.COLOR_VGA|PXCUPipeline.DEPTH_QVGA))
+  {
     print("Failed to initialize PXCUPipeline\n");
     exit();
   }
 
-  int[] lm_size=PXCUPipeline.QueryDepthMapSize();//QueryLabelMapSize();
+  int[] lm_size=session.QueryDepthMapSize();//QueryLabelMapSize();
   if (lm_size!=null) {
     print("LabelMapSize("+lm_size[0]+","+lm_size[1]+")\n");
     display=createImage(lm_size[0], lm_size[1], RGB);
   }
 
-  int[] uv_size=PXCUPipeline.QueryUVMapSize();
+  int[] uv_size=session.QueryUVMapSize();
   if (uv_size!=null) print("UVMapSize("+uv_size[0]+","+uv_size[1]+")\n");
 
-
-
-
-  mode=PXCUPipeline.PXCU_PIPELINE_COLOR_VGA; 
-  PXCUPipeline.Init(mode);
-
-  int[] rgb_size=PXCUPipeline.QueryRGBSize();
+  int[] rgb_size=session.QueryRGBSize();
   println("querying RGBSize");
   if (rgb_size!=null) {
     print("RGBSize("+rgb_size[0]+","+rgb_size[1]+")\n");
     rgbImage=createImage(rgb_size[0], rgb_size[1], RGB);
   }
 
-
-  mode=PXCUPipeline.PXCU_PIPELINE_DEPTH_VGA;
-
-  PXCUPipeline.Init(mode);
-
-  depth_size=PXCUPipeline.QueryDepthMapSize();
+  depth_size=session.QueryDepthMapSize();
   println("querying DepthSize");
   if (depth_size!=null) {
     print("DepthSize("+depth_size[0]+","+depth_size[1]+")\n");
@@ -71,12 +56,7 @@ void setup() {
     depthImage=createImage(depth_size[0], depth_size[1], ALPHA);
   }
 
-
-  //GRAB IR CAMERA IMAGE
-  mode=PXCUPipeline.PXCU_PIPELINE_CAPTURE; 
-  PXCUPipeline.Init(mode);
-
-  ir_size=PXCUPipeline.QueryIRMapSize();
+  ir_size=session.QueryIRMapSize();
   println("querying IRSize");
   if (ir_size!=null) {
     print("IR Size("+ir_size[0]+","+ir_size[1]+")\n");
@@ -85,11 +65,7 @@ void setup() {
     irImage=createImage(ir_size[0], ir_size[1], ALPHA);
   }
 
-  //GRAB UV MAP 
-  mode=PXCUPipeline.PXCU_PIPELINE_DEPTH_VGA; 
-  PXCUPipeline.Init(mode);
-
-  uv_size=PXCUPipeline.QueryUVMapSize();
+  uv_size=session.QueryUVMapSize();
   println("querying UVSize");
   if (uv_size!=null) {
     print("UV Size("+uv_size[0]+","+uv_size[1]+")\n");
@@ -103,16 +79,16 @@ void setup() {
 void draw() { 
   background(0);
 
-  if (PXCUPipeline.AcquireFrame(true)) { //if this is set to false it flashes
+  if (session.AcquireFrame(true)) { //if this is set to false it flashes
     float[] acc=new float[3];
-    PXCUPipeline.QueryDeviceProperty(PXCMCapture.Device.PROPERTY_ACCELEROMETER_READING, acc);
+    session.QueryDeviceProperty(PXCMCapture.Device.PROPERTY_ACCELEROMETER_READING, acc);
 
-    if (PXCUPipeline.QueryLabelMapAsImage(display)) image(display, 0, 0);
-    if (PXCUPipeline.QueryRGB(rgbImage)) image(rgbImage, 320, 0, 320, 240);
+    if (session.QueryLabelMapAsImage(display)) image(display, 0, 0);
+    if (session.QueryRGB(rgbImage)) image(rgbImage, 320, 0, 320, 240);
 
 
     //REMAPPING THE DEPTH IMAGE TO A PIMAGE
-    PXCUPipeline.QueryDepthMap(depthMap);
+    session.QueryDepthMap(depthMap);
     depthImage.loadPixels();
     for (int i = 0; i < depth_size[0]*depth_size[1]; i++) {
       depthImage.pixels[i] = color(map(depthMap[i], 0, 4000, 0, 255));
@@ -122,7 +98,7 @@ void draw() {
 
 
     //REMAPPING THE IR IMAGE TO A PIMAGE
-    PXCUPipeline.QueryIRMap(irMap);
+    session.QueryIRMap(irMap);
     irImage.loadPixels();
     for (int i = 0; i < ir_size[0]*ir_size[1]; i++) {
       irImage.pixels[i] = color(map(irMap[i], 0, 4000, 0, 255));
@@ -132,7 +108,7 @@ void draw() {
 
 
     //maskDetails
-    PXCMGesture.GeoNode hand1MaskDetails = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_MASK_DETAILS);
+    PXCMGesture.GeoNode hand1MaskDetails = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_MASK_DETAILS);
     if (hand1MaskDetails!=null) {
 
       pushStyle();
@@ -146,7 +122,7 @@ void draw() {
 
     if (handTracking) {
       //hand1Fingertip
-      PXCMGesture.GeoNode hand1Fingertip = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_FINGERTIP);
+      PXCMGesture.GeoNode hand1Fingertip = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_FINGERTIP);
       if (hand1Fingertip!=null) {
 
         pushStyle();
@@ -156,7 +132,7 @@ void draw() {
         popStyle();
       }
 
-      PXCMGesture.GeoNode hand2Fingertip = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_HAND_FINGERTIP);
+      PXCMGesture.GeoNode hand2Fingertip = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_HAND_FINGERTIP);
       if (hand2Fingertip!=null) {
 
         pushStyle();
@@ -168,7 +144,7 @@ void draw() {
 
 
       //hand1 HandUpper
-      PXCMGesture.GeoNode hand1Upper = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_UPPER);
+      PXCMGesture.GeoNode hand1Upper = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_UPPER);
       if (hand1Upper!=null) {
 
         pushStyle();
@@ -178,7 +154,7 @@ void draw() {
         popStyle();
       }
       //hand1Middle
-      PXCMGesture.GeoNode hand1HandMiddle = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_MIDDLE);
+      PXCMGesture.GeoNode hand1HandMiddle = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_HAND_MIDDLE);
       if (hand1HandMiddle!=null) {
 
         pushStyle();
@@ -197,7 +173,7 @@ void draw() {
 
       //FINGER TRACKING
       //hand1Thumb
-      PXCMGesture.GeoNode hand1Thumb = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB);
+      PXCMGesture.GeoNode hand1Thumb = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB);
       if (hand1Thumb!=null) {
 
         pushStyle();
@@ -208,7 +184,7 @@ void draw() {
       }
 
       //hand1Index
-      PXCMGesture.GeoNode hand1Index = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX);
+      PXCMGesture.GeoNode hand1Index = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX);
       if (hand1Index!=null) {
 
         pushStyle();
@@ -219,7 +195,7 @@ void draw() {
       }
 
       //hand1Middle
-      PXCMGesture.GeoNode hand1Middle = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE);
+      PXCMGesture.GeoNode hand1Middle = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE);
       if (hand1Middle!=null) {
 
         pushStyle();
@@ -230,7 +206,7 @@ void draw() {
       }
 
       //hand1Ring
-      PXCMGesture.GeoNode hand1Ring = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_RING);
+      PXCMGesture.GeoNode hand1Ring = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_RING);
       if (hand1Ring!=null) {
         pushStyle();
         fill(255, 100, 25);
@@ -241,7 +217,7 @@ void draw() {
 
 
       //hand1Pinky
-      PXCMGesture.GeoNode hand1Pinky = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY);
+      PXCMGesture.GeoNode hand1Pinky = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY);
       if (hand1Pinky!=null) {
         pushStyle();
         fill(255, 100, 25);
@@ -255,7 +231,7 @@ void draw() {
 
       //FINGER TRACKING
       //hand2Thumb
-      PXCMGesture.GeoNode hand2Thumb = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB);
+      PXCMGesture.GeoNode hand2Thumb = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB);
       if (hand2Thumb!=null) {
 
         pushStyle();
@@ -266,7 +242,7 @@ void draw() {
       }
 
       //hand2Index
-      PXCMGesture.GeoNode hand2Index = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX);
+      PXCMGesture.GeoNode hand2Index = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX);
       if (hand2Index!=null) {
 
         pushStyle();
@@ -277,7 +253,7 @@ void draw() {
       }
 
       //hand2Middle
-      PXCMGesture.GeoNode hand2Middle = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE);
+      PXCMGesture.GeoNode hand2Middle = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE);
       if (hand2Middle!=null) {
 
         pushStyle();
@@ -288,7 +264,7 @@ void draw() {
       }
 
       //hand2Ring
-      PXCMGesture.GeoNode hand2Ring = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_RING);
+      PXCMGesture.GeoNode hand2Ring = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_RING);
       if (hand2Ring!=null) {
         pushStyle();
         fill(255, 100, 25);
@@ -299,7 +275,7 @@ void draw() {
 
 
       //hand2Pinky
-      PXCMGesture.GeoNode hand2Pinky = PXCUPipeline.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY);
+      PXCMGesture.GeoNode hand2Pinky = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY);
       if (hand2Pinky!=null) {
         pushStyle();
         fill(255, 100, 25);
@@ -309,27 +285,22 @@ void draw() {
       }
     }
 
-    PXCMGesture.Gesture gdata=PXCUPipeline.QueryGesture(PXCMGesture.GeoNode.LABEL_ANY);
+    PXCMGesture.Gesture gdata=session.QueryGesture(PXCMGesture.GeoNode.LABEL_ANY);
     if (gdata!=null) print("gesture "+gdata.label+"\n");
 
-    int faces[]=PXCUPipeline.QueryFaceID();
+    int faces[]=session.QueryFaceID();
     if (faces!=null) {
-      long timeStamp=PXCUPipeline.QueryFaceTimeStamp();
+      long timeStamp=session.QueryFaceTimeStamp();
 
-      PXCMFaceAnalysis.Detection.Data ddata=PXCUPipeline.QueryFaceLocationData(faces[0]);
+      PXCMFaceAnalysis.Detection.Data ddata=session.QueryFaceLocationData(faces[0]);
       if (ddata!=null) print("face: id="+ddata.fid+", "+ddata.rectangle+"\n");
 
-      PXCMFaceAnalysis.Landmark.LandmarkData ldata=PXCUPipeline.QueryFaceLandmarkData(faces[0], PXCMFaceAnalysis.Landmark.LABEL_NOSE_TIP, 0);
+      PXCMFaceAnalysis.Landmark.LandmarkData ldata=session.QueryFaceLandmarkData(faces[0], PXCMFaceAnalysis.Landmark.LABEL_NOSE_TIP, 0);
       if (ldata!=null) print("landmark left-eye "+faces[0]+","+ldata.position+"\n");
     }
-    PXCUPipeline.ReleaseFrame();
+    session.ReleaseFrame();
     popMatrix();
   }
 }
 
-void exit()
-{
-  PXCUPipeline.Close(); 
-  super.exit();
-}
 

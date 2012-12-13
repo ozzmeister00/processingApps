@@ -9,49 +9,35 @@
  *******************************************************************************/
 import intel.pcsdk.*; //import the Intel Perceptual Computing SDK
 
-private static PImage labelImage, rgbImage, depthImage, irImage;
-
-private static int mode=PXCUPipeline.PXCU_PIPELINE_COLOR_VGA;
-
 short[] depthMap;
-int[] depth_size;
-
 short[] irMap;
+int[] depth_size;
 int[] ir_size;
-
-
+PImage labelImage, rgbImage, depthImage, irImage;
+PXCUPipeline session;
 void setup() {
   size(640, 480);
-  mode=PXCUPipeline.PXCU_PIPELINE_GESTURE; 
-
-  if (!PXCUPipeline.Init(mode)) {
-    print("Failed to initialize PXCUPipeline\n");
+  session = new PXCUPipeline(this);
+  if(!session.Init(session.GESTURE|session.COLOR_VGA|session.DEPTH_QVGA))
     exit();
-  }
-
 
   //SETUP LABEL IMAGE
-  int[] lm_size=PXCUPipeline.QueryDepthMapSize();
+  int[] lm_size=session.QueryDepthMapSize();
   if (lm_size!=null) {
     print("LabelMapSize("+lm_size[0]+","+lm_size[1]+")\n");
     labelImage=createImage(lm_size[0], lm_size[1], RGB);
   }
 
   //SETUP RGB IMAGE
-  mode=PXCUPipeline.PXCU_PIPELINE_COLOR_VGA;
-  PXCUPipeline.Init(mode);
-  int[] rgb_size=PXCUPipeline.QueryRGBSize();
+  int[] rgb_size=session.QueryRGBSize();
   println("querying RGBSize");
   if (rgb_size!=null) {
     print("RGBSize("+rgb_size[0]+","+rgb_size[1]+")\n");
     rgbImage=createImage(rgb_size[0], rgb_size[1], RGB);
   }
 
-
   //SETUP DEPTH MAP
-  mode=PXCUPipeline.PXCU_PIPELINE_DEPTH_VGA;
-  PXCUPipeline.Init(mode);
-  depth_size=PXCUPipeline.QueryDepthMapSize();
+  depth_size=session.QueryDepthMapSize();
   println("querying DepthSize");
   if (depth_size!=null) {
     print("DepthSize("+depth_size[0]+","+depth_size[1]+")\n");
@@ -60,11 +46,8 @@ void setup() {
     depthImage=createImage(depth_size[0], depth_size[1], ALPHA);
   }
 
-
   //SETUP IR IMAGE
-  mode=PXCUPipeline.PXCU_PIPELINE_CAPTURE; 
-  PXCUPipeline.Init(mode);
-  ir_size=PXCUPipeline.QueryIRMapSize();
+  ir_size=session.QueryIRMapSize();
   println("querying IRSize");
   if (ir_size!=null) {
     print("IR Size("+ir_size[0]+","+ir_size[1]+")\n");
@@ -76,12 +59,12 @@ void setup() {
 void draw() { 
   background(0);
 
-  if (PXCUPipeline.AcquireFrame(true)) { //if this is set to false it flashes
+  if (session.AcquireFrame(true)) { //if this is set to false it flashes
 
-    PXCUPipeline.QueryLabelMapAsImage(labelImage);
+    session.QueryLabelMapAsImage(labelImage);
     image(labelImage, 0, 0);
 
-    PXCUPipeline.QueryRGB(rgbImage);
+    session.QueryRGB(rgbImage);
     image(rgbImage, 320, 0, 320, 240);
 
 
@@ -89,7 +72,7 @@ void draw() {
     float remapMouseY = map(mouseY, 0, height, 255, 8192);
 
     //REMAPPING THE DEPTH IMAGE TO A PIMAGE
-    PXCUPipeline.QueryDepthMap(depthMap);
+    session.QueryDepthMap(depthMap);
     depthImage.loadPixels();
     for (int i = 0; i < depth_size[0]*depth_size[1]; i++) {
       depthImage.pixels[i] = color(map(depthMap[i], 0, remapMouseX, 0, 255));
@@ -100,7 +83,7 @@ void draw() {
 
 
     //REMAPPING THE IR IMAGE TO A PIMAGE
-    PXCUPipeline.QueryIRMap(irMap);
+    session.QueryIRMap(irMap);
     irImage.loadPixels();
     for (int i = 0; i < ir_size[0]*ir_size[1]; i++) {
       irImage.pixels[i] = color(map(irMap[i], 0, remapMouseY, 0, 255));
@@ -108,14 +91,14 @@ void draw() {
     irImage.updatePixels();
     image(irImage, 320, 240, 320, 240);
 
-    PXCUPipeline.ReleaseFrame();//VERY IMPORTANT TO RELEASE THE FRAME
+    session.ReleaseFrame();//VERY IMPORTANT TO RELEASE THE FRAME
   }
 }
 
 
 void exit()
 {
-  PXCUPipeline.Close(); 
+  session.Close(); 
   super.exit();
 }
 
