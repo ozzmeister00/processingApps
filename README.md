@@ -19,3 +19,8 @@ Download [processing](http://processing.org)</b>
   * requires [v3ga Blob Detection](http://www.v3ga.net/processing/BlobDetection/)
   * requires [fisica](http://www.ricardmarxer.com/fisica/)
   * Notes: Needs better polygon creation routines, any takers?
+* <b>PanZoomRotate</b> - Basic Panning, Rotation and Zooming in 2D (Ratko Jagodic)
+  * Pan - grab with one hand and move around, release to stop panning
+  * Zoom - grab with two hands and move them apart, zooming happens around the centerpoint between the two hands
+  * Rotate - grab with two hands and rotate them, rotation happens around the centerpoint between the two hands
+  * [See video] (http://www.youtube.com/watch?v=mzERtHSBV7w)
