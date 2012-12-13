@@ -65,7 +65,9 @@ void draw()
           stroke(fc);
           pushMatrix();
           translate(0,0,-500);
-          point((x*2)-320,(y*2)-240,depthMap[i_p]*0.8);
+          int px = (int)(map(x*2,0,640,-320,320));
+          int py = (int)(map(y*2,0,480,-240,240));
+          point(px,py,depthMap[i_p]*0.8);
           popMatrix();
           popStyle();
         }
