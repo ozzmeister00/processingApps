@@ -20,10 +20,10 @@ void setup()
   noFill();
   noStroke();
   session = new PXCUPipeline(this);
-  session.Init(PXCUPipeline.PXCU_PIPELINE_GESTURE);
+  session.Init(PXCUPipeline.GESTURE|PXCUPipeline.DEPTH_QVGA);
   lm = session.QueryLabelMapSize();
   labelMap = createImage(lm[0],lm[1],RGB);
-
+  depthMap = createImage(lm[0],lm[1],ALPHA);
   blobDetector = new BlobDetection(lm[0], lm[1]);  
   blobDetector.setPosDiscrimination(false);
   blobDetector.setThreshold(0.1);
@@ -48,6 +48,8 @@ void draw()
     addCircles();
   if(session.QueryLabelMapAsImage(labelMap))
   {
+    session.QueryDepthMap(depth);
+    for(int p=0;
     //image(labelMap,0,0);
     blobDetector.computeBlobs(labelMap.pixels);
     Blob current;
@@ -78,20 +80,20 @@ void draw()
     world.step();
     session.QueryDepthMap(depth);
     
-    //world.draw(this);
+    world.draw(this);
     for(FPoly wp : labelBlobs)
     {
       world.remove(wp);
     }
     labelBlobs.clear();    
   }
-  PXCUPipeline.ReleaseFrame();
+  session.ReleaseFrame();
 }
 
 void stop()
 {
   super.stop();
-  PXCUPipeline.Close();
+  session.Close();
 }
 
 void addCircles()
@@ -105,12 +107,13 @@ void addCircles()
     c.setVelocity(0,random(300,500));
     c.setRestitution(0.5);
     c.setDamping(0);
-    c.setDrawable(false);
+    //c.setDrawable(false);
     c.setGrabbable(false);
     world.add(c);
   }
 }
 
+/*
 void drawCircles()
 {
   for(FPoly b : labelBlobs)
@@ -118,4 +121,4 @@ void drawCircles()
     pushMatrix();
     translate(b.getX(),b.getY())
   }
-}
+}*/
