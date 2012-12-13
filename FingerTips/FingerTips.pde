@@ -13,11 +13,12 @@ import intel.pcsdk.*;
 private static int mode=PXCUPipeline.PXCU_PIPELINE_GESTURE;
 boolean fingerTracking = true;
 PImage display;
+PXCUPipeline session;
 
 void setup() {
   size(640, 480);
-
-  if (!PXCUPipeline.Init(mode)) {
+  session = new PXCUPipeline(this);
+  if (!session.Init(mode)) {
     print("Failed to initialize PXCUPipeline\n");
     exit();
   }

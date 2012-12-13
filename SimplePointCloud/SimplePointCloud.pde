@@ -19,8 +19,9 @@ void setup()
   noFill();
   size(sWidth, sHeight, OPENGL);
   
-  if(!PXCUPipeline.Init(PXCUPipeline.PXCU_PIPELINE_GESTURE|PXCUPipeline.PXCU_PIPELINE_DEPTH_VGA)) exit();
-  depthMapSize = PXCUPipeline.QueryDepthMapSize();
+  session = new PXCUPipeline(this);
+  if(!session.Init(PXCUPipeline.GESTURE|PXCUPipeline.DEPTH_QVGA|PXCUPipeline.COLOR_VGA)) exit();
+  depthMapSize = session.QueryDepthMapSize();
   depthMap = new short[depthMapSize[0] * depthMapSize[1]];
   colorImage = createImage(640,480,RGB);
 }
@@ -39,10 +40,10 @@ void draw()
     popStyle();
   }
 
-  if(PXCUPipeline.AcquireFrame(true))
+  if(session.AcquireFrame(true))
   {
-    PXCUPipeline.QueryDepthMap(depthMap);
-    PXCUPipeline.QueryRGB(colorImage);
+    session.QueryDepthMap(depthMap);
+    session.QueryRGB(colorImage);
     if(drawRGB)
     {
       pushMatrix();
@@ -71,7 +72,7 @@ void draw()
       }
     }
     popMatrix();
-    PXCUPipeline.ReleaseFrame();
+    session.ReleaseFrame();
   }
 }
 
