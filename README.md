@@ -8,6 +8,7 @@ Download [processing](http://processing.org)</b>
   * Mouse movement sets depth and ir visibility
 * <b>HandVisualizer</b> - Basic hand and fingertip tracking, for processing 1.5.1 and 2.beta6 ([Chris](http://twitter.com/_ChrisRojas_))
 * <b>FingerTips</b> - Basic fingertip tracking, for processing 1.5.1 and 2.beta6 ([Chris](http://twitter.com/_ChrisRojas_))
+* <b>Movement3D</b> - 3D Navigation sample/test, for processing 1.5.1 and 2.beta6 ([Chris](http://twitter.com/_ChrisRojas_))
 * <b>HandViz</b> - Hand position and openness tracking/visualizer, for processing 1.5.1 and processing 2.beta6 ([Seth](http://twitter.com/djTomServo))
 * <b>FingerFluid</b> - Fingertip tracking and fluid, for processing 1.5.1  ([Seth](http://twitter.com/djTomServo))
   * requires [diewald_fluid](http://thomasdiewald.com/blog/?p=95)
