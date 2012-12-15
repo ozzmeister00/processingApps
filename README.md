@@ -1,6 +1,6 @@
 PerceptualP5 
 ------------
-<b>Processing Sketches from the Perceptual Computing Lab<br>
+<b>Processing Sketches from the [Perceptual Computing Lab](http://about.me/intelperceptual)<br>
 Download the [Perceptual Computing SDK](http://software.intel.com/en-us/vcsource/tools/perceptual-computing-sdk)<br/>
 Download [processing](http://processing.org)</b>
 
