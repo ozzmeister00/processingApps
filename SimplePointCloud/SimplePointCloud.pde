@@ -4,8 +4,8 @@ import intel.pcsdk.*;
 int sWidth = 640;
 int sHeight = 480;
 int maxDepth = 900;
-boolean debug=true;
-boolean drawRGB=true;
+boolean debug=false;
+boolean drawRGB=false;
 boolean rgbPts=true;
 short[] depthMap;
 int[] depthMapSize;
@@ -29,7 +29,7 @@ void setup()
 
 void draw()
 {
-  background(0);
+  background(0,32,0);
   pushMatrix();
   translate(width/2,height/2,-200);  
   rotateY(radians(180+mouseX));
@@ -66,6 +66,7 @@ void draw()
           if(rgbPts)
             fc = getColorFromDepth(x,y);
           stroke(fc);
+          strokeWeight(3);
           pushMatrix();
           translate(0,0,-500);
           int px = (int)(map(x*2,0,640,-320,320));

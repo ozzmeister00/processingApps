@@ -13,6 +13,7 @@ Copyright(c) 2012 Intel Corporation. All Rights Reserved.
 import intel.pcsdk.*;
 
 boolean trackHand = true;
+boolean released = false;
 int radiusMin = 24;
 int radiusMax = 70;
 int xStep = 32;
@@ -41,6 +42,7 @@ void setup()
 
 void draw()
 {
+  released = false;
   background(0);
   if(!session.AcquireFrame(true))
     return;
@@ -57,6 +59,7 @@ void draw()
       image(labelMap,0,0);
       popMatrix();
     }
+    session.ReleaseFrame();    
     PXCMGesture.GeoNode hand = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY);
     if(hand!=null)
     {
@@ -90,7 +93,5 @@ void draw()
       popMatrix();
     }    
   }
-  
-  session.ReleaseFrame();
 }
 

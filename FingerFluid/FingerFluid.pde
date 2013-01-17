@@ -134,12 +134,12 @@ void draw()
     {
       for(int p=0;p<positions.size();p++)
       {
-        PVector ft = (PVector)positions.get(p);
+        PVector ft = (PVector)positions.get(p);        
         if(ft.x>=0&&ft.y>=0)
         {
           float r = map(ft.x,0,320,0,.25);
           float b = map(ft.y,0,240,0,.25);
-          if(ft.z>0.5)
+          if(ft.z<0.2)
             setDens(fluid,(int)ft.x*2,(int)ft.y*2,16,16,r,.125,b);
           setVel(fluid,(int)ft.x*2,(int)ft.y*2,4,4,0,-.75);
         }
