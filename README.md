@@ -25,7 +25,7 @@ Download [processing](http://processing.org)</b>
   * Press 'c' to toggle RGB image
   * Press 'd' to toggle wire box
   * Press 'r' to toggle RGB points
-* <b>PanZoomRotate</b> - Basic Panning, Rotation and Zooming in 2D (Ratko Jagodic)
+* <b>PanZoomRotate</b> - Basic Panning, Rotation and Zooming in 2D ([Ratko](http://twitter.com/ThatRatko))
   * Pan - grab with one hand and move around, release to stop panning
   * Zoom - grab with two hands and move them apart, zooming happens around the centerpoint between the two hands
   * Rotate - grab with two hands and rotate them, rotation happens around the centerpoint between the two hands
