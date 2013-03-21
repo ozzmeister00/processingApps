@@ -8,8 +8,10 @@ Copyright(c) 2012 Intel Corporation. All Rights Reserved.
 Parts of this code released under the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or any later version.
 ******************************************************************************/
+//Works in Processing 1.5.1, not 2.0+
+//Updated for Beta3 API
 
-import processing.opengl.*;
+//import processing.opengl.*;
 import codeanticode.glgraphics.*;
 import diewald_fluid.Fluid2D;
 import diewald_fluid.Fluid2D_CPU;
@@ -18,6 +20,8 @@ import diewald_fluid.Fluid2D_GPU;
 import intel.pcsdk.*;
 
 PXCUPipeline session;
+
+boolean useGPU = false;  //Must have a decent graphics card
 PImage bkg;
 boolean curtain = false;
 boolean drawLabel = true;
@@ -54,7 +58,8 @@ void setup()
     exit();
   }
   fluid = createFluidSolver();
-  int[] lm_size=session.QueryDepthMapSize();
+  int[] lm_size= new int[2];
+  session.QueryDepthMapSize(lm_size);
   if (lm_size!=null)
   {
     bkg = createImage(lm_size[0], lm_size[1], RGB);
@@ -86,7 +91,8 @@ void draw()
     }
     for(int i=0;i<tipLabels.length;i++)
     {
-      PXCMGesture.GeoNode node = session.QueryGeoNode(tipLabels[i]);
+      PXCMGesture.GeoNode node=new PXCMGesture.GeoNode();
+      session.QueryGeoNode(tipLabels[i], node);
       if(node!=null)
       {
         positions.set(i,new PVector(node.positionImage.x,node.positionImage.y,node.positionWorld.y));
@@ -139,7 +145,7 @@ void draw()
         {
           float r = map(ft.x,0,320,0,.25);
           float b = map(ft.y,0,240,0,.25);
-          if(ft.z<0.2)
+          if(ft.z<1) //was 0.2
             setDens(fluid,(int)ft.x*2,(int)ft.y*2,16,16,r,.125,b);
           setVel(fluid,(int)ft.x*2,(int)ft.y*2,4,4,0,-.75);
         }
@@ -187,7 +193,12 @@ void setVel(Fluid2D fluid2d, int x, int y, int sizex, int sizey, float velx, flo
 
 Fluid2D createFluidSolver()
 {
-  Fluid2D fluid_tmp = new Fluid2D_GPU(this, fX, fY); // initialize de solver
+  Fluid2D fluid_tmp;
+  if(useGPU){
+   fluid_tmp = new Fluid2D_GPU(this, fX, fY); // initialize de solver
+  }else{
+   fluid_tmp = new Fluid2D_CPU(this, fX, fY); // initialize de solver
+  }
 
   fluid_tmp.setParam_Timestep  ( 0.10f );
   fluid_tmp.setParam_Iterations( 16 );

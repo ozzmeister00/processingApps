@@ -1,3 +1,6 @@
+//Updating to Beta3
+
+import processing.opengl.*;
 import intel.pcsdk.*;
 
 int sw = 640;
@@ -8,63 +11,74 @@ PImage colorImage;
 PXCUPipeline session;
 PXCMFaceAnalysis.Landmark.LandmarkData[] facePts;
 
-int faceLabels[] = {PXCMFaceAnalysis.Landmark.LABEL_LEFT_EYE_OUTER_CORNER,
-                    PXCMFaceAnalysis.Landmark.LABEL_LEFT_EYE_INNER_CORNER,
-                    PXCMFaceAnalysis.Landmark.LABEL_RIGHT_EYE_OUTER_CORNER,
-                    PXCMFaceAnalysis.Landmark.LABEL_RIGHT_EYE_INNER_CORNER,                    
-                    PXCMFaceAnalysis.Landmark.LABEL_MOUTH_LEFT_CORNER,
-                    PXCMFaceAnalysis.Landmark.LABEL_MOUTH_RIGHT_CORNER};
+int faceLabels[] = {
+  PXCMFaceAnalysis.Landmark.LABEL_LEFT_EYE_OUTER_CORNER, 
+  PXCMFaceAnalysis.Landmark.LABEL_LEFT_EYE_INNER_CORNER, 
+  PXCMFaceAnalysis.Landmark.LABEL_RIGHT_EYE_OUTER_CORNER, 
+  PXCMFaceAnalysis.Landmark.LABEL_RIGHT_EYE_INNER_CORNER, 
+  PXCMFaceAnalysis.Landmark.LABEL_MOUTH_LEFT_CORNER, 
+  PXCMFaceAnalysis.Landmark.LABEL_MOUTH_RIGHT_CORNER
+};
 
 void setup()
 {
-  size(sw,sh,OPENGL);
+  size(sw, sh, P3D);
   noFill();
   noStroke();
-  
-  colorImage = createImage(640,480,RGB);
+
+  colorImage = createImage(640, 480, RGB);
   session = new PXCUPipeline(this);
-  session.Init(PXCUPipeline.FACE_LANDMARK|PXCUPipeline.COLOR_VGA);
+  if (!session.Init(PXCUPipeline.FACE_LANDMARK|PXCUPipeline.COLOR_VGA)) {
+    println("Failed to intiialize");
+    exit();
+  }
 }
 
 void draw()
 {
   tracked.clear();
-  if(!session.AcquireFrame(true))
+  if (!session.AcquireFrame(true))
     return;
-  
+
   session.QueryRGB(colorImage);
-  image(colorImage,0,0);  
-  int[] faces = session.QueryFaceID();
-  pushStyle();  
-  if(faces!=null)
-  {
-    for(int f=0;f<faces.length;f++)
+  image(colorImage, 0, 0);  
+
+  long[] faces = new long [4]; //how many faces do you intend to track? times 2
+  if (session.QueryFaceID(0, faces)) {
+   
+    for (int f=0;f<faces.length;f+=2)
     {
-      PXCMFaceAnalysis.Detection.Data faceLoc = session.QueryFaceLocationData(faces[f]);
-      if(faceLoc!=null)
-      {
+       int faceId = int(faces[f]);
+
+      PXCMFaceAnalysis.Detection.Data faceLoc;
+      faceLoc = new PXCMFaceAnalysis.Detection.Data();
+      if (session.QueryFaceLocationData(faceId, faceLoc)) {
+
+       
+        pushStyle();  
         stroke(255);
         strokeWeight(2);
-        rect(faceLoc.rectangle.x,faceLoc.rectangle.y,faceLoc.rectangle.w,faceLoc.rectangle.h);
-        for(int i=0;i<faceLabels.length;i++)
+        rect(faceLoc.rectangle.x, faceLoc.rectangle.y, faceLoc.rectangle.w, faceLoc.rectangle.h);
+        popStyle();
+
+        for (int i=0;i<faceLabels.length;i++)
         {
-          facePts = session.QueryFaceLandmarkData(faces[f],faceLabels[i]);
-          if(facePts!=null)
+          PXCMFaceAnalysis.Landmark.LandmarkData facePts2 = new PXCMFaceAnalysis.Landmark.LandmarkData();
+          session.QueryFaceLandmarkData(faceId, i, faceId, facePts2);
+
+          if (facePts2!=null)
           {
-            for(int p=0;p<facePts.length;p++)
-            {
-              pushStyle();
-              fill(255);
-              ellipse(facePts[p].position.x,facePts[p].position.y,5,5);
-              popStyle();
-            }
+            //println("found a face");
+            pushStyle();
+            fill(255);
+            ellipse(facePts2.position.x, facePts2.position.y, 5, 5);
+            popStyle();
           }
         }
       }
     }
   }
-  popStyle();  
+
   session.ReleaseFrame();
 }
-
 

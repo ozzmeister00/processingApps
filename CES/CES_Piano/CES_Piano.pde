@@ -51,7 +51,8 @@ void setup()
   session = new PXCUPipeline(this);
   session.Init(PXCUPipeline.DEPTH_QVGA|PXCUPipeline.GESTURE);
 
-  dm = session.QueryDepthMapSize();
+  dm = new int[2];
+  session.QueryDepthMapSize(dm);
   if(dm!=null)
   {
     depth = new short[dm[0]*dm[1]];
@@ -108,7 +109,9 @@ void draw()
     //Button cb = (Button)buttons.get(b);    
     for(int t=0;t<fingertips.length;t++)
     {
-      PXCMGesture.GeoNode tip = session.QueryGeoNode(fingertips[t]);
+      
+      PXCMGesture.GeoNode tip = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(fingertips[t], tip);
       if(tip!=null)
       {
         int pix=(int)(width-(tip.positionImage.x*2));

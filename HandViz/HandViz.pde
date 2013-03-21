@@ -7,7 +7,7 @@ Copyright(c) 2012 Intel Corporation. All Rights Reserved.
 ******************************************************************************/
 
 //comment this out if running Processing 2
-//import processing.opengl.*;
+import processing.opengl.*;
 //----------------------------------------
 
 import intel.pcsdk.*;
@@ -30,7 +30,8 @@ void setup()
 {
   session = new PXCUPipeline(this);
   session.Init(PXCUPipeline.GESTURE);
-  int[] labelMapSize = session.QueryLabelMapSize();
+  int[] labelMapSize = new int[2];
+  session.QueryLabelMapSize(labelMapSize);
   labelMap = createImage(labelMapSize[0],labelMapSize[1],RGB);
   tracked.add(new PVector(-10,-10,1));
 
@@ -59,13 +60,15 @@ void draw()
       image(labelMap,0,0);
       popMatrix();
     }
-    session.ReleaseFrame();    
-    PXCMGesture.GeoNode hand = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY);
+        
+    PXCMGesture.GeoNode hand = new PXCMGesture.GeoNode();
+    session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY, hand);
     if(hand!=null)
     {
       tracked.set(0,new PVector(width-hand.positionImage.x*2,hand.positionImage.y*2,hand.openness*0.01));
-      //println(hand.positionWorld.z);
+      println(hand.positionWorld.z);
     }
+    session.ReleaseFrame(); //must do tracking before frame is released
   }
 
   for(int y=0;y<height+yStep-1;y+=yStep)
@@ -89,7 +92,7 @@ void draw()
       //largest ellipse will always be on top
       pushMatrix();
       translate(x,y,distRatio); 
-      ellipse(0,0,ellipseRadius,ellipseRadius);
+      ellipse(0,0,ellipseRadius*2,ellipseRadius*2);
       popMatrix();
     }    
   }

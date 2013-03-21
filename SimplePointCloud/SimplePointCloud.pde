@@ -1,3 +1,4 @@
+//Updated to Beta3
 //import processing.opengl.*;
 import intel.pcsdk.*;
 
@@ -22,7 +23,9 @@ void setup()
   
   session = new PXCUPipeline(this);
   if(!session.Init(PXCUPipeline.GESTURE|PXCUPipeline.DEPTH_QVGA|PXCUPipeline.COLOR_VGA)) exit();
-  depthMapSize = session.QueryDepthMapSize();
+  //depthMapSize = session.QueryDepthMapSize();
+  depthMapSize = new int[2];
+  session.QueryDepthMapSize(depthMapSize);
   depthMap = new short[depthMapSize[0] * depthMapSize[1]];
   colorImage = createImage(640,480,RGB);
 }

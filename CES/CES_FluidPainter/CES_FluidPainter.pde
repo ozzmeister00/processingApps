@@ -1,4 +1,4 @@
-import processing.opengl.*;
+//import processing.opengl.*; //uncomment if using Processing 1.5.1
 import codeanticode.glgraphics.*;
 import diewald_fluid.Fluid2D;
 import diewald_fluid.Fluid2D_CPU;
@@ -45,7 +45,8 @@ void setup()
     exit();
   }
   fluid = createFluidSolver();
-  lm_size=session.QueryDepthMapSize();
+  lm_size= new int[2];
+  session.QueryDepthMapSize(lm_size);
   if (lm_size!=null)
   {
     bkg = createImage(lm_size[0], lm_size[1], RGB);
@@ -84,7 +85,8 @@ void draw()
     for(int i=0;i<tipLabels.length;i++)
     {
       oldPos[i].set(positions[i]);
-      PXCMGesture.GeoNode node = session.QueryGeoNode(tipLabels[i]);
+      PXCMGesture.GeoNode node = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(tipLabels[i], node);
       if(node!=null)
       {
         float px = map(node.positionImage.x,oldXMin, oldXMax,0,320);

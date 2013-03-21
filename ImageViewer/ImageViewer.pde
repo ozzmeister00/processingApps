@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  
  INTEL CORPORATION PROPRIETARY INFORMATION
@@ -7,6 +8,8 @@
  Copyright(c) 2012 Intel Corporation. All Rights Reserved.
  
  *******************************************************************************/
+//Updated to work with Beta 3, Beta 2 no longer works with this code -Rojas
+
 import intel.pcsdk.*; //import the Intel Perceptual Computing SDK
 
 short[] depthMap;
@@ -15,21 +18,26 @@ int[] depth_size;
 int[] ir_size;
 PImage labelImage, rgbImage, depthImage, irImage;
 PXCUPipeline session;
+
 void setup() {
   size(640, 480);
   session = new PXCUPipeline(this);
-  if(!session.Init(session.GESTURE|session.COLOR_VGA|session.DEPTH_QVGA))
+  if (!session.Init(session.GESTURE|session.COLOR_VGA|session.DEPTH_QVGA))
     exit();
 
   //SETUP LABEL IMAGE
-  int[] lm_size=session.QueryDepthMapSize();
+  int[] lm_size = new int[2];
+  session.QueryDepthMapSize(lm_size);
+
   if (lm_size!=null) {
     print("LabelMapSize("+lm_size[0]+","+lm_size[1]+")\n");
     labelImage=createImage(lm_size[0], lm_size[1], RGB);
   }
 
+
   //SETUP RGB IMAGE
-  int[] rgb_size=session.QueryRGBSize();
+  int[] rgb_size = new int[2];
+  session.QueryRGBSize(rgb_size);
   println("querying RGBSize");
   if (rgb_size!=null) {
     print("RGBSize("+rgb_size[0]+","+rgb_size[1]+")\n");
@@ -37,7 +45,8 @@ void setup() {
   }
 
   //SETUP DEPTH MAP
-  depth_size=session.QueryDepthMapSize();
+  depth_size = new int[2];
+  session.QueryDepthMapSize(depth_size);
   println("querying DepthSize");
   if (depth_size!=null) {
     print("DepthSize("+depth_size[0]+","+depth_size[1]+")\n");
@@ -47,7 +56,8 @@ void setup() {
   }
 
   //SETUP IR IMAGE
-  ir_size=session.QueryIRMapSize();
+  ir_size = new int[2];
+  session.QueryIRMapSize(ir_size);
   println("querying IRSize");
   if (ir_size!=null) {
     print("IR Size("+ir_size[0]+","+ir_size[1]+")\n");
@@ -73,7 +83,6 @@ void draw() {
 
     //REMAPPING THE DEPTH IMAGE TO A PIMAGE
     session.QueryDepthMap(depthMap);
-    depthImage.loadPixels();
     for (int i = 0; i < depth_size[0]*depth_size[1]; i++) {
       depthImage.pixels[i] = color(map(depthMap[i], 0, remapMouseX, 0, 255));
     }
@@ -84,7 +93,6 @@ void draw() {
 
     //REMAPPING THE IR IMAGE TO A PIMAGE
     session.QueryIRMap(irMap);
-    irImage.loadPixels();
     for (int i = 0; i < ir_size[0]*ir_size[1]; i++) {
       irImage.pixels[i] = color(map(irMap[i], 0, remapMouseY, 0, 255));
     }

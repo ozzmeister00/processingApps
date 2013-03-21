@@ -7,7 +7,10 @@
  Copyright(c) 2012 Intel Corporation. All Rights Reserved.
  
  *******************************************************************************/
+//Updated for Beta3
 import intel.pcsdk.*;
+
+
 //comment this out if running Processing 2
 //import processing.opengl.*;
 //----------------------------------------
@@ -40,13 +43,15 @@ void setup()
 
   if ((mode&PXCUPipeline.GESTURE)!=0)
   {
-    int[] lm_size=session.QueryDepthMapSize();//QueryLabelMapSize();
+    int[] lm_size= new int[2];
+    session.QueryDepthMapSize(lm_size);//QueryLabelMapSize();
     if (lm_size!=null) {
       print("LabelMapSize("+lm_size[0]+","+lm_size[1]+")\n");
       display=createImage(lm_size[0], lm_size[1], RGB);
     }
 
-    int[] uv_size=session.QueryUVMapSize();
+    int[] uv_size= new int[2];
+    session.QueryUVMapSize(uv_size);
     if (uv_size!=null) print("UVMapSize("+uv_size[0]+","+uv_size[1]+")\n");
   }
   camPos = new PVector(0, 0, 0);
@@ -71,23 +76,36 @@ println(openThreshhold);
 
     //FINGER TRACKING
 
-    //Hand 1, first hand detected, left or right specific
-    PXCMGesture.GeoNode hand1Thumb = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB);
-    PXCMGesture.GeoNode hand1Index = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX);
-    PXCMGesture.GeoNode hand1Middle = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE);
-    PXCMGesture.GeoNode hand1Ring = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_RING);
-    PXCMGesture.GeoNode hand1Pinky = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY);
+      //Hand 1, first hand detected, left or right specific
+      PXCMGesture.GeoNode hand1Thumb=new PXCMGesture.GeoNode();
+      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB, hand1Thumb);
+      PXCMGesture.GeoNode hand1Index = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX, hand1Index);
+      PXCMGesture.GeoNode hand1Middle = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE, hand1Middle);
+      PXCMGesture.GeoNode hand1Ring = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_RING, hand1Ring);
+      PXCMGesture.GeoNode hand1Pinky = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY, hand1Pinky);
 
-    //Hand 2, second hand detected
-    PXCMGesture.GeoNode hand2Thumb = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB);
-    PXCMGesture.GeoNode hand2Index = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX);
-    PXCMGesture.GeoNode hand2Middle = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE);
-    PXCMGesture.GeoNode hand2Ring = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_RING);
-    PXCMGesture.GeoNode hand2Pinky = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY);
+      //Hand 2, second hand detected
+      PXCMGesture.GeoNode hand2Thumb = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB, hand2Thumb);
+      PXCMGesture.GeoNode hand2Index = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX, hand2Index);
+      PXCMGesture.GeoNode hand2Middle = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE, hand2Middle);
+      PXCMGesture.GeoNode hand2Ring = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_RING, hand2Ring);
+      PXCMGesture.GeoNode hand2Pinky = new PXCMGesture.GeoNode();
+      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY, hand2Pinky);
 
     // Hand openness
-    PXCMGesture.GeoNode hand1 = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY);
-    PXCMGesture.GeoNode hand2 = session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY);
+    PXCMGesture.GeoNode hand1 = new PXCMGesture.GeoNode();
+    session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY, hand1);
+   
+    PXCMGesture.GeoNode hand2 = new PXCMGesture.GeoNode();
+    session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY, hand2);
 
 
     //Finger counting

@@ -27,11 +27,16 @@ class Hand
 	public Hand(PXCUPipeline pp)
 	{
 		perc = pp;
+                PXCMGesture.GeoNode geoHand = new PXCMGesture.GeoNode();
+                perc.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_LEFT, geoHand);
 	}
 	
 	
-	public void updateHand(PXCMGesture.GeoNode newHand)
+	public void updateHand(int nodeType) //did have geonode here
 	{
+                PXCMGesture.GeoNode newHand = new PXCMGesture.GeoNode();
+                perc.QueryGeoNode(nodeType, newHand);
+ 
 		prevHand = hand;
 		hand = newHand;
 		
