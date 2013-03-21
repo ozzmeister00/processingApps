@@ -64,7 +64,7 @@ void draw()
         for (int i=0;i<faceLabels.length;i++)
         {
           PXCMFaceAnalysis.Landmark.LandmarkData facePts2 = new PXCMFaceAnalysis.Landmark.LandmarkData();
-          session.QueryFaceLandmarkData(faceId, i, faceId, facePts2);
+          session.QueryFaceLandmarkData(faceId, faceLabels[i], faceId, facePts2);
 
           if (facePts2!=null)
           {
