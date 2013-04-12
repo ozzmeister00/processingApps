@@ -9,6 +9,8 @@ boolean rgbPts=true;
 short[] depthMap;
 
 int maxDepth = 900;
+int ptSize = 1;
+
 int[] depthMapSize = new int[2];
 int[] uvMapSize = new int[2];
 
@@ -89,7 +91,7 @@ void draw()
   {
     drawPoint = false;
     stroke(0,255,0);
-    strokeWeight(4);
+    strokeWeight(ptSize);
     PVector pt = (PVector)pointCloud.get(p);
     int cx = (int)(uvMap[((int)pt.y*depthMapSize[0]+(int)pt.x)*2]*640+0.5f);
     int cy = (int)(uvMap[((int)pt.y*depthMapSize[0]+(int)pt.x)*2+1]*480+0.5f);
@@ -129,6 +131,16 @@ void keyPressed()
   }
   if(key=='p')
     rgbPts=!rgbPts;
+  if(key=='a')
+  {
+    --ptSize;
+    if(ptSize<=0)
+      ptSize=1;
+  }
+  if(key=='s')
+  {
+    ++ptSize;
+  }
 }
 
 color getColorFromDepth(int px, int py)
