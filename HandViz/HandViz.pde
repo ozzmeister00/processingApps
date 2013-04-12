@@ -7,7 +7,7 @@ Copyright(c) 2012 Intel Corporation. All Rights Reserved.
 ******************************************************************************/
 
 //comment this out if running Processing 2
-import processing.opengl.*;
+//import processing.opengl.*;
 //----------------------------------------
 
 import intel.pcsdk.*;
@@ -21,7 +21,7 @@ int yStep = 32;
 float screenDist; 
 color percBlue = color(2,114,162);
 color percOrange = color(242,143,24);
-ArrayList<PVector> tracked = new ArrayList();
+ArrayList<PVector> tracked = new ArrayList<PVector>();
 PImage labelMap;
 
 PXCUPipeline session;
@@ -35,7 +35,7 @@ void setup()
   labelMap = createImage(labelMapSize[0],labelMapSize[1],RGB);
   tracked.add(new PVector(-10,-10,1));
 
-  size(640, 480, OPENGL); //use opengl so we can z-order the ellipses
+  size(640, 480, P3D); //use opengl so we can z-order the ellipses
   screenDist = dist(0,0,width/12,height/12);
   noStroke();
   background(0);
@@ -45,30 +45,30 @@ void draw()
 {
   released = false;
   background(0);
-  if(!session.AcquireFrame(true))
-    return;
   if(!trackHand)
     tracked.set(0,new PVector(mouseX,mouseY,1));
   else
   {
-    if(session.QueryLabelMapAsImage(labelMap))
+    if(session.AcquireFrame(true))
     {
-      //little hack to mirror the label map
-      pushMatrix();
-      translate(640,0);
-      scale(-2,2);
-      image(labelMap,0,0);
-      popMatrix();
+      if(session.QueryLabelMapAsImage(labelMap))
+      {
+        //little hack to mirror the label map
+        pushMatrix();
+        translate(640,0);
+        scale(-2,2);
+        image(labelMap,0,0);
+        popMatrix();
+      }
+          
+      PXCMGesture.GeoNode hand = new PXCMGesture.GeoNode();
+      if(session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY, hand))
+      {
+        tracked.set(0,new PVector(width-hand.positionImage.x*2,hand.positionImage.y*2,hand.openness*0.01));
+        println(hand.positionWorld.z);
+      }
+      session.ReleaseFrame(); //must do tracking before frame is released
     }
-        
-    PXCMGesture.GeoNode hand = new PXCMGesture.GeoNode();
-    session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY, hand);
-    if(hand!=null)
-    {
-      tracked.set(0,new PVector(width-hand.positionImage.x*2,hand.positionImage.y*2,hand.openness*0.01));
-      println(hand.positionWorld.z);
-    }
-    session.ReleaseFrame(); //must do tracking before frame is released
   }
 
   for(int y=0;y<height+yStep-1;y+=yStep)
