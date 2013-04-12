@@ -82,23 +82,36 @@ void draw()
   }
   
   pushMatrix();
-  translate(-160,-120,-400);
+  translate(0,0,-450);
   colorImage.loadPixels();
+  boolean drawPoint = false;
   for(int p=0;p<pointCloud.size();++p)
   {
+    drawPoint = false;
     stroke(0,255,0);
-    strokeWeight(2);
+    strokeWeight(4);
     PVector pt = (PVector)pointCloud.get(p);
     int cx = (int)(uvMap[((int)pt.y*depthMapSize[0]+(int)pt.x)*2]*640+0.5f);
     int cy = (int)(uvMap[((int)pt.y*depthMapSize[0]+(int)pt.x)*2+1]*480+0.5f);
     if (cx >= 0 && cx < 640 && cy >= 0 && cy < 480 && rgbPts)
     {
+      drawPoint = true;
       stroke(colorImage.pixels[cy*640+cx]);
     }
     else
-      stroke(0,255,0);
-    
-    point(pt.x,pt.y,pt.z*0.5);
+    {
+      if(!rgbPts)
+      {
+        drawPoint = true;
+        stroke(0,255,0);
+      }
+      else
+      {
+        drawPoint = false;
+      }
+    }
+    if(drawPoint)
+      point(map(pt.x,0,320,-320,320),map(pt.y,0,240,-240,240),pt.z*0.8);
   }
   popMatrix();
   popMatrix();
