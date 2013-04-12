@@ -1,84 +1,70 @@
-//Updating to Beta3
-
-import processing.opengl.*;
 import intel.pcsdk.*;
 
-int sw = 640;
-int sh = 480;
-
-ArrayList<PVector> tracked = new ArrayList(1);
-PImage colorImage;
 PXCUPipeline session;
-PXCMFaceAnalysis.Landmark.LandmarkData[] facePts;
+PImage rgbTex;
 
-int faceLabels[] = {
-  PXCMFaceAnalysis.Landmark.LABEL_LEFT_EYE_OUTER_CORNER, 
-  PXCMFaceAnalysis.Landmark.LABEL_LEFT_EYE_INNER_CORNER, 
-  PXCMFaceAnalysis.Landmark.LABEL_RIGHT_EYE_OUTER_CORNER, 
-  PXCMFaceAnalysis.Landmark.LABEL_RIGHT_EYE_INNER_CORNER, 
-  PXCMFaceAnalysis.Landmark.LABEL_MOUTH_LEFT_CORNER, 
-  PXCMFaceAnalysis.Landmark.LABEL_MOUTH_RIGHT_CORNER
-};
+int[] faceLabels = {PXCMFaceAnalysis.Landmark.LABEL_LEFT_EYE_OUTER_CORNER,
+                  PXCMFaceAnalysis.Landmark.LABEL_LEFT_EYE_INNER_CORNER,
+                  PXCMFaceAnalysis.Landmark.LABEL_RIGHT_EYE_OUTER_CORNER,
+                  PXCMFaceAnalysis.Landmark.LABEL_RIGHT_EYE_INNER_CORNER,
+                  PXCMFaceAnalysis.Landmark.LABEL_MOUTH_LEFT_CORNER,
+                  PXCMFaceAnalysis.Landmark.LABEL_MOUTH_RIGHT_CORNER};
+
+ArrayList<PXCMPoint3DF32> facePts = new ArrayList<PXCMPoint3DF32>();
+ArrayList<PXCMRectU32> faceBoxes = new ArrayList<PXCMRectU32>();
 
 void setup()
 {
-  size(sw, sh, P3D);
-  noFill();
-  noStroke();
-
-  colorImage = createImage(640, 480, RGB);
+  size(640,480);
+  rgbTex = createImage(640,480,RGB);
   session = new PXCUPipeline(this);
-  if (!session.Init(PXCUPipeline.FACE_LANDMARK|PXCUPipeline.COLOR_VGA)) {
-    println("Failed to intiialize");
-    exit();
-  }
+  session.Init(PXCUPipeline.COLOR_VGA|PXCUPipeline.FACE_LOCATION|PXCUPipeline.FACE_LANDMARK);
 }
 
 void draw()
 {
-  tracked.clear();
-  if (!session.AcquireFrame(true))
-    return;
-
-  session.QueryRGB(colorImage);
-  image(colorImage, 0, 0);  
-
-  long[] faces = new long [4]; //how many faces do you intend to track? times 2
-  if (session.QueryFaceID(0, faces)) {
-   
-    for (int f=0;f<faces.length;f+=2)
+  if(session.AcquireFrame(true))
+  {
+    session.QueryRGB(rgbTex);
+    facePts.clear();
+    faceBoxes.clear();
+    
+    for(int i=0;;++i)
     {
-       int faceId = int(faces[f]);
-
-      PXCMFaceAnalysis.Detection.Data faceLoc;
-      faceLoc = new PXCMFaceAnalysis.Detection.Data();
-      if (session.QueryFaceLocationData(faceId, faceLoc)) {
-
-       
-        pushStyle();  
-        stroke(255);
-        strokeWeight(2);
-        rect(faceLoc.rectangle.x, faceLoc.rectangle.y, faceLoc.rectangle.w, faceLoc.rectangle.h);
-        popStyle();
-
-        for (int i=0;i<faceLabels.length;i++)
-        {
-          PXCMFaceAnalysis.Landmark.LandmarkData facePts2 = new PXCMFaceAnalysis.Landmark.LandmarkData();
-          session.QueryFaceLandmarkData(faceId, faceLabels[i], faceId, facePts2);
-
-          if (facePts2!=null)
+      long[] ft = new long[2];
+      if(!session.QueryFaceID(i,ft))
+        break;
+      PXCMFaceAnalysis.Detection.Data fdata = new PXCMFaceAnalysis.Detection.Data();
+      if(session.QueryFaceLocationData((int)ft[0], fdata))
+      {
+        faceBoxes.add(fdata.rectangle);
+        
+        PXCMFaceAnalysis.Landmark.LandmarkData lmark = new PXCMFaceAnalysis.Landmark.LandmarkData();
+        for(int f=0;f<faceLabels.length;++f)
+        { 
+          if(session.QueryFaceLandmarkData((int)ft[0],faceLabels[f], 0, lmark))
           {
-            //println("found a face");
-            pushStyle();
-            fill(255);
-            ellipse(facePts2.position.x, facePts2.position.y, 5, 5);
-            popStyle();
+            facePts.add(lmark.position);
           }
         }
       }
     }
+    session.ReleaseFrame();
   }
-
-  session.ReleaseFrame();
+  image(rgbTex,0,0);
+  pushStyle();
+  stroke(255);
+  noFill();
+  for(int f=0;f<faceBoxes.size();++f)
+  {
+    PXCMRectU32 faceLoc = (PXCMRectU32)faceBoxes.get(f);
+    rect(faceLoc.x,faceLoc.y,faceLoc.w,faceLoc.h);
+  }
+  fill(0,255,0);
+  for(int g=0;g<facePts.size();++g)
+  {
+    PXCMPoint3DF32 facePt = (PXCMPoint3DF32)facePts.get(g);
+    ellipse(facePt.x,facePt.y,5,5);
+  }  
+  popStyle();
 }
-
