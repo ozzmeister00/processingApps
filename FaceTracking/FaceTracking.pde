@@ -23,7 +23,7 @@ void setup()
 
 void draw()
 {
-  if(session.AcquireFrame(true))
+  if(session.AcquireFrame(false))
   {
     session.QueryRGB(rgbTex);
     facePts.clear();
