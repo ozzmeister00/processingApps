@@ -53,11 +53,13 @@ class Landmarks
           for (int i=0;i<faceLabels.length;i++)
           {
             PXCMFaceAnalysis.Landmark.LandmarkData facePts2 = new PXCMFaceAnalysis.Landmark.LandmarkData();
-            _session.QueryFaceLandmarkData(faceId, faceLabels[i], faceId, facePts2);//faceLabels[i]
-            if (facePts2!=null && facePts2.position.x != 0)
+            if(_session.QueryFaceLandmarkData(faceId, faceLabels[i], faceId, facePts2))//faceLabels[i]
             {
-              spots[i].x = facePts2.position.x;
-              spots[i].y = facePts2.position.y;
+              if(facePts2.position.x != 0)
+              {
+                spots[i].x = facePts2.position.x;
+                spots[i].y = facePts2.position.y;
+              }
             }
           }
         }

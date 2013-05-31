@@ -20,50 +20,56 @@ class Hands {
   };
 
 
-  Hands() { //init stuff
+  Hands()
+  { //init stuff
     int[] labelMapSize = new int[2];
     session.QueryLabelMapSize(labelMapSize);
     labelMapImage = createImage(labelMapSize[0], labelMapSize[1], RGB);
-    for (int i=0;i<5;i++) {
+    for (int i=0;i<5;i++)
+    {
       primaryHand[i] = new PVector(1, 1, 1);
       secondaryHand[i] = new PVector(1, 1, 1);
     }
   }
 
-  void update(PXCUPipeline _session) {
+  void update(PXCUPipeline _session)
+ {
     _session.AcquireFrame(true);
+    _session.QueryLabelMapAsImage(labelMapImage);
 
-    session.QueryLabelMapAsImage(labelMapImage);
-
-    for (int i=0;i<PrimaryHandLabels.length;i++) {
+    for(int i=0;i<PrimaryHandLabels.length;i++)
+    {
       PXCMGesture.GeoNode primaryHandNode=new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PrimaryHandLabels[i], primaryHandNode);
-
-      if (primaryHandNode!=null && primaryHandNode.positionImage.x != 0 && primaryHandNode.positionWorld.x >0);// && facePts2.position.x != 0)
+      if(_session.QueryGeoNode(PrimaryHandLabels[i], primaryHandNode))
       {
-        primaryHand[i].x = primaryHandNode.positionImage.x;
-        primaryHand[i].y = primaryHandNode.positionImage.y;
-        primaryHand[i].z = map(primaryHandNode.positionWorld.y, 0, 1, 100, 0);
+        if(primaryHandNode.positionImage.x != 0 && primaryHandNode.positionWorld.x >0)
+        {
+          primaryHand[i].x = primaryHandNode.positionImage.x;
+          primaryHand[i].y = primaryHandNode.positionImage.y;
+          primaryHand[i].z = map(primaryHandNode.positionWorld.y, 0, 1, 100, 0);
+        }
       }
     }
 
-
-    for (int i=0;i<SecondaryHandLabels.length;i++) {
+    for (int i=0;i<SecondaryHandLabels.length;i++)
+    {
       PXCMGesture.GeoNode secondaryHandNode=new PXCMGesture.GeoNode();
-      session.QueryGeoNode(SecondaryHandLabels[i], secondaryHandNode);
-
-      if (secondaryHandNode!=null && secondaryHandNode.positionImage.x != 0 && secondaryHandNode.positionWorld.x >0);// && facePts2.position.x != 0)
+      if(_session.QueryGeoNode(SecondaryHandLabels[i], secondaryHandNode))
       {
-        secondaryHand[i].x = secondaryHandNode.positionImage.x;
-        secondaryHand[i].y = secondaryHandNode.positionImage.y;
-        secondaryHand[i].z = map(secondaryHandNode.positionWorld.y, 0, 1, 100, 0);
+        if(secondaryHandNode.positionImage.x != 0 && secondaryHandNode.positionWorld.x >0)
+        {
+          secondaryHand[i].x = secondaryHandNode.positionImage.x;
+          secondaryHand[i].y = secondaryHandNode.positionImage.y;
+          secondaryHand[i].z = map(secondaryHandNode.positionWorld.y, 0, 1, 100, 0);
+        }
       }
     }
 
     session.ReleaseFrame();
   }
 
-  void drawPrimaryHand() {
+  void drawPrimaryHand()
+  {
     pushStyle();  
     fill(25, 255, 200, 200);
     for (int i = 0;i<5;i++) {
@@ -74,7 +80,8 @@ class Hands {
     popStyle();
   }
 
-  void drawSecondaryHand() {
+  void drawSecondaryHand()
+  {
     pushStyle();  
     fill(25, 255, 200, 200);
     for (int i = 0;i<5;i++) {
@@ -85,7 +92,8 @@ class Hands {
     popStyle();
   }
 
-  void drawHands() {
+  void drawHands()
+  {
     drawPrimaryHand();
     drawSecondaryHand();
   }
