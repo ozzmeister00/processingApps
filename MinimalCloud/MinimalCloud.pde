@@ -1,10 +1,7 @@
-//Beta 3 Minimalist Point Cloud Example
-
-//import processing.opengl.*;
 import intel.pcsdk.*;
 
 short[] depthMap;
-int[] depthMapSize;
+int[] depthMapSize = new int[2];
 
 PXCUPipeline session;
 
@@ -16,8 +13,9 @@ void setup()
   noFill();
 
   session = new PXCUPipeline(this);
-  if (!session.Init(PXCUPipeline.GESTURE|PXCUPipeline.DEPTH_QVGA)) exit();
-  depthMapSize = new int[2];
+  if(!session.Init(PXCUPipeline.GESTURE|PXCUPipeline.DEPTH_QVGA))
+    exit();
+
   session.QueryDepthMapSize(depthMapSize);
   depthMap = new short[depthMapSize[0] * depthMapSize[1]];
 }
@@ -29,9 +27,12 @@ void draw()
   translate(width/2, height/2, -200);  
   rotateY(radians(180+mouseX));
 
-  session.AcquireFrame(true);
-  session.QueryDepthMap(depthMap);
-
+  if(session.AcquireFrame(false))
+  {
+    session.QueryDepthMap(depthMap);
+    session.ReleaseFrame();
+  }
+  
   translate(0, 0, -500);
 
   for (int x = 0; x < depthMapSize[0]; x+=2)
@@ -45,6 +46,6 @@ void draw()
     }
   }
 
-  session.ReleaseFrame();
+
 }
 

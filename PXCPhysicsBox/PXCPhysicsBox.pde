@@ -1,109 +1,99 @@
-/*******************************************************************************
- 
- INTEL CORPORATION PROPRIETARY INFORMATION
- This software is supplied under the terms of a license agreement or nondisclosure
- agreement with Intel Corporation and may not be copied or disclosed except in
- accordance with the terms of that agreement
- Copyright(c) 2012 Intel Corporation. All Rights Reserved.
- 
- *******************************************************************************/
- 
-//import processing.opengl.*;
-
 import intel.pcsdk.*;
 import blobDetection.*;
 import fisica.*;
 
 short[] depth;
 int[] lm = new int[2];
-PImage labelMap;
-PImage depthMap;
+PImage labelMap, depthMap;
+
 BlobDetection blobDetector;
-FWorld world;
+
 ArrayList<FPoly> labelBlobs = new ArrayList();
 ArrayList<FCircle> drops = new ArrayList();
+FWorld world;
+
 PXCUPipeline session;
 
 void setup()
 {
-  size(640,480,OPENGL);
+  size(640,480);
   noFill();
   noStroke();
   session = new PXCUPipeline(this);
-  session.Init(PXCUPipeline.GESTURE|PXCUPipeline.DEPTH_QVGA);
-  lm = session.QueryLabelMapSize();
-  labelMap = createImage(lm[0],lm[1],RGB);
-  depthMap = createImage(lm[0],lm[1],ALPHA);
-  blobDetector = new BlobDetection(lm[0], lm[1]);  
-  blobDetector.setPosDiscrimination(false);
-  blobDetector.setThreshold(0.1);
-  
-  lm = session.QueryDepthMapSize();
-  depth = new short[lm[0]*lm[1]];
+  if(!session.Init(PXCUPipeline.GESTURE|PXCUPipeline.DEPTH_QVGA))
+    exit();
+  if(session.QueryLabelMapSize(lm))
+  {
+    labelMap = createImage(lm[0],lm[1],RGB);
+    depthMap = createImage(lm[0],lm[1],ALPHA);
+    blobDetector = new BlobDetection(lm[0], lm[1]);  
+    blobDetector.setPosDiscrimination(false);
+    blobDetector.setThreshold(0.1);
+  }
+  if(session.QueryDepthMapSize(lm))
+    depth = new short[lm[0]*lm[1]];
   
   Fisica.init(this);
   world = new FWorld();
   world.setEdges();
   world.setGravity(0,800);
   world.remove(world.bottom);
-  frameRate(30);
+  frameRate(60);
 }
 
 void draw()
 {
-  if(!session.AcquireFrame(true))
-    return;
   background(33,159,210);
   if((frameCount % 24)==0)
     addCircles();
-  if(session.QueryLabelMapAsImage(labelMap))
+  
+  if(session.AcquireFrame(false))
+  {    
+    session.QueryLabelMapAsImage(labelMap);
+    session.QueryDepthMap(depth);
+    session.ReleaseFrame();
+  }    
+    
+  blobDetector.computeBlobs(labelMap.pixels);
+  Blob current;
+  EdgeVertex e0,e1;
+  
+  for(int b=0;b<blobDetector.getBlobNb();b++)
   {
-    session.QueryDepthMap(depth);
-    //for(int p=0;
-    //image(labelMap,0,0);
-    blobDetector.computeBlobs(labelMap.pixels);
-    Blob current;
-    EdgeVertex e0,e1;
-    
-    for(int b=0;b<blobDetector.getBlobNb();b++)
+    current=blobDetector.getBlob(b);
+    FPoly p = new FPoly();
+    p.setStaticBody(true);
+    p.setStrokeWeight(2);
+    p.setStroke(255,161,51);
+    p.setFill(146,185,30);
+    p.setDensity(1);
+    p.setDrawable(true);
+    p.setGrabbable(false);
+    if(current!=null)
     {
-      current=blobDetector.getBlob(b);
-      FPoly p = new FPoly();
-      p.setStaticBody(true);
-      p.setStrokeWeight(2);
-      p.setStroke(255,161,51);
-      p.setFill(146,185,30);
-      p.setDensity(1);
-      p.setDrawable(false);
-      p.setGrabbable(false);
-      if(current!=null)
+      for(int e=0;e<current.getEdgeNb();e+=7)
       {
-        for(int e=0;e<current.getEdgeNb();e+=7)
-        {
-          e1 = current.getEdgeVertexB(e);
-          p.vertex(e1.x*width,e1.y*height);
-        }
+        e1 = current.getEdgeVertexB(e);
+        p.vertex(e1.x*width,e1.y*height);
       }
-      world.add(p);
-      labelBlobs.add(p);
     }
-    world.step();
-    session.QueryDepthMap(depth);
-    
-    world.draw(this);
-    for(FPoly wp : labelBlobs)
-    {
-      world.remove(wp);
-    }
-    labelBlobs.clear();    
+    world.add(p);
+    labelBlobs.add(p);
   }
-  session.ReleaseFrame();
+  world.step();
+  world.draw(this);
+  
+  for(FPoly wp : labelBlobs)
+  {
+    world.remove(wp);
+  }
+  labelBlobs.clear();    
 }
 
 void stop()
 {
-  super.stop();
   session.Close();
+  super.stop();
 }
 
 void addCircles()

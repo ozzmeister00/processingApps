@@ -1,5 +1,3 @@
-//Updated to Beta3
-//import processing.opengl.*;
 import intel.pcsdk.*;
 
 boolean debug=true;
@@ -34,19 +32,17 @@ void setup()
   size(640,480,P3D);
   
   session = new PXCUPipeline(this);
-  if(!session.Init(PXCUPipeline.DEPTH_QVGA|PXCUPipeline.COLOR_VGA)) exit();
+  if(!session.Init(PXCUPipeline.DEPTH_QVGA|PXCUPipeline.COLOR_VGA))
+    exit();
   
-  session.QueryDepthMapSize(depthMapSize);
-  depthMap = new short[depthMapSize[0] * depthMapSize[1]];
-  
-  session.QueryUVMapSize(uvMapSize);
-  uvMap = new float[uvMapSize[0] * uvMapSize[1] * 2];
-  
-  session.QueryRGBSize(rgbMapSize);
-  colorImage = createImage(rgbMapSize[0],rgbMapSize[1],RGB);
-  
-  session.QueryIRMapSize(irMapSize);
-  irMap = new short[irMapSize[0]*irMapSize[1]];
+  if(session.QueryDepthMapSize(depthMapSize))
+    depthMap = new short[depthMapSize[0] * depthMapSize[1]];
+  if(session.QueryUVMapSize(uvMapSize))
+    uvMap = new float[uvMapSize[0] * uvMapSize[1] * 2];
+  if(session.QueryRGBSize(rgbMapSize))
+    colorImage = createImage(rgbMapSize[0],rgbMapSize[1],RGB);
+  if(session.QueryIRMapSize(irMapSize))
+    irMap = new short[irMapSize[0]*irMapSize[1]];
 }
 
 void draw()
