@@ -27,7 +27,7 @@ void setup()
 {
   size(640, 480);
   session = new PXCUPipeline(this);
-  if (!session.Init(session.GESTURE|session.COLOR_VGA|session.DEPTH_QVGA))
+  if (!session.Init(PXCUPipeline.GESTURE|PXCUPipeline.COLOR_VGA|PXCUPipeline.DEPTH_QVGA))
     exit();
 
   //SETUP LABEL IMAGE
