@@ -27,17 +27,15 @@ private static PImage display, rgbImage, depthImage, irImage;
 PXCUPipeline session;
 PXCMGesture.GeoNode mNode;
 
-int HANDS = 2;
 int[] mHands = {PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY,
                                       PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY};
                                       
-int SECTIONS = 4;                                      
+                                     
 int[] mSections = {PXCMGesture.GeoNode.LABEL_HAND_FINGERTIP,
                                           PXCMGesture.GeoNode.LABEL_HAND_UPPER,
                                           PXCMGesture.GeoNode.LABEL_HAND_MIDDLE,                                      
                                           PXCMGesture.GeoNode.LABEL_HAND_LOWER};
 
-int FINGERS = 5;                         
 int[] mFingers = {PXCMGesture.GeoNode.LABEL_FINGER_THUMB,
                                           PXCMGesture.GeoNode.LABEL_FINGER_INDEX,
                                           PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE,                                      
@@ -115,9 +113,9 @@ void draw()
 
     if (handTracking)
     {
-      for(int i=0;i<HANDS;++i)
+      for(int i=0;i<mHands.length;++i)
       {
-        for(int j=0;j<SECTIONS;++j)
+        for(int j=0;j<mSections.length;++j)
         {
           if(session.QueryGeoNode(mHands[i]|mSections[j], mNode))
             mSectionsPos.add(new PVector(mNode.positionImage.x, mNode.positionImage.y));
@@ -127,9 +125,9 @@ void draw()
 
     if (fingerTracking)
     {
-      for(int i=0;i<HANDS;++i)
+      for(int i=0;i<mHands.length;++i)
       {
-        for(int j=0;j<FINGERS;++j)
+        for(int j=0;j<mFingers.length;++j)
         {
           if(session.QueryGeoNode(mHands[i]|mFingers[j], mNode))
             mFingersPos.add(new PVector(mNode.positionImage.x, mNode.positionImage.y));
