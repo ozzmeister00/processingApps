@@ -49,32 +49,20 @@ void draw() {
 
       //FINGER TRACKING
     if (fingerTracking) { 
- 
 
       //Hand 1, first hand detected, left or right specific
       PXCMGesture.GeoNode hand1Thumb=new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB, hand1Thumb);
       PXCMGesture.GeoNode hand1Index = new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX, hand1Index);
-      PXCMGesture.GeoNode hand1Middle = new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE, hand1Middle);
-      PXCMGesture.GeoNode hand1Ring = new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_RING, hand1Ring);
+      PXCMGesture.GeoNode hand1Middle = new PXCMGesture.GeoNode(); 
+      PXCMGesture.GeoNode hand1Ring = new PXCMGesture.GeoNode(); 
       PXCMGesture.GeoNode hand1Pinky = new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY, hand1Pinky);
 
       //Hand 2, second hand detected
       PXCMGesture.GeoNode hand2Thumb = new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB, hand2Thumb);
       PXCMGesture.GeoNode hand2Index = new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX, hand2Index);
       PXCMGesture.GeoNode hand2Middle = new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE, hand2Middle);
       PXCMGesture.GeoNode hand2Ring = new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_RING, hand2Ring);
       PXCMGesture.GeoNode hand2Pinky = new PXCMGesture.GeoNode();
-      session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY, hand2Pinky);
-
 
 
       //Scale tracked points
@@ -83,27 +71,27 @@ void draw() {
    
       //Drawing the fingertips on screen
       fill(255,0,0);
-      if (hand1Thumb!=null) {
+      if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB, hand1Thumb)) {
         ellipse(hand1Thumb.positionImage.x, hand1Thumb.positionImage.y, 5, 5);
         text("   thumb", hand1Thumb.positionImage.x, hand1Thumb.positionImage.y);
       }
       
-      if (hand1Index!=null) {
+      if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX, hand1Index)) {
         ellipse(hand1Index.positionImage.x, hand1Index.positionImage.y, 5, 5);
         text("   index", hand1Index.positionImage.x, hand1Index.positionImage.y);
       }
       
-      if (hand1Middle!=null) {
+      if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE, hand1Middle)) {
         ellipse(hand1Middle.positionImage.x, hand1Middle.positionImage.y, 5, 5);
         text("   middle", hand1Middle.positionImage.x, hand1Middle.positionImage.y);
       }
       
-      if (hand1Ring!=null) {
+      if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_RING, hand1Ring)) {
         ellipse(hand1Ring.positionImage.x, hand1Ring.positionImage.y, 5, 5);
         text("   ring", hand1Ring.positionImage.x, hand1Ring.positionImage.y);
       }
 
-      if (hand1Pinky!=null) {
+      if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY, hand1Pinky)) {
         ellipse(hand1Pinky.positionImage.x, hand1Pinky.positionImage.y, 5, 5);
         text("   pinky", hand1Pinky.positionImage.x, hand1Pinky.positionImage.y);
       }
@@ -111,27 +99,27 @@ void draw() {
 
 
       //Hand2
-      if (hand2Thumb!=null) {
+      if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_THUMB, hand2Thumb)) {
         ellipse(hand2Thumb.positionImage.x, hand2Thumb.positionImage.y, 5, 5);
         text("   thumb", hand2Thumb.positionImage.x, hand2Thumb.positionImage.y);
       }
       
-      if (hand2Index!=null) {
+      if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_INDEX, hand2Index)) {
         ellipse(hand2Index.positionImage.x, hand2Index.positionImage.y, 5, 5);
         text("   index", hand2Index.positionImage.x, hand2Index.positionImage.y);
       }
       
-      if (hand2Middle!=null) {
+      if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_MIDDLE, hand2Middle)) {
         ellipse(hand2Middle.positionImage.x, hand2Middle.positionImage.y, 5, 5);
         text("   middle", hand2Middle.positionImage.x, hand2Middle.positionImage.y);
       }
       
-      if (hand2Ring!=null) {
+      if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_RING, hand2Ring)) {
         ellipse(hand2Ring.positionImage.x, hand2Ring.positionImage.y, 5, 5);
         text("   ring", hand2Ring.positionImage.x, hand2Ring.positionImage.y);
       }
       
-      if (hand2Pinky!=null) {
+      if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY, hand2Pinky)) {
         ellipse(hand2Pinky.positionImage.x, hand2Pinky.positionImage.y, 5, 5);
         text("   pinky", hand2Pinky.positionImage.x, hand2Pinky.positionImage.y);
       }
