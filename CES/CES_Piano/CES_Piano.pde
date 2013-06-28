@@ -111,8 +111,8 @@ void draw()
     {
       
       PXCMGesture.GeoNode tip = new PXCMGesture.GeoNode();
-      session.QueryGeoNode(fingertips[t], tip);
-      if(tip!=null)
+      
+      if(session.QueryGeoNode(fingertips[t], tip))
       {
         int pix=(int)(width-(tip.positionImage.x*2));
         int piy = (int)(tip.positionImage.y*2);
