@@ -35,12 +35,12 @@ class Hand
 	public void updateHand(int nodeType) //did have geonode here
 	{
                 PXCMGesture.GeoNode newHand = new PXCMGesture.GeoNode();
-                perc.QueryGeoNode(nodeType, newHand);
+                boolean haveHand = perc.QueryGeoNode(nodeType, newHand);
  
 		prevHand = hand;
 		hand = newHand;
 		
-		if(hand != null)
+		if(haveHand)
 		{
 			visible = true;
 			
@@ -58,7 +58,10 @@ class Hand
 				closeCoords = screenCoords;
 		}
 		else
+                {
 			visible = false;
+                        hand = null;
+                }
 	}
 	
 	
