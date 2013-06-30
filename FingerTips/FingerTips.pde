@@ -10,9 +10,7 @@
 //Updated to Beta3
 import intel.pcsdk.*;
 
-
-boolean fingerTracking = true;
-PImage display;
+PImage labelMap;
 PXCUPipeline session;
 
 void setup() {
@@ -23,19 +21,11 @@ void setup() {
     exit();
   }
 
-  //int[] lm_size=session.QueryDepthMapSize(); //old code
-   int[] lm_size= new int[2];
-   session.QueryDepthMapSize(lm_size);
-  if (lm_size!=null)
+  int[] labelMap_Size = new int[2];
+  if(session.QueryLabelMapSize(labelMap_Size))
   {
-    print("LabelMapSize("+lm_size[0]+","+lm_size[1]+")\n");
-    display=createImage(lm_size[0], lm_size[1], RGB);
-
-
-    //int[] uv_size=session.QueryUVMapSize();/old code
-    int[] uv_size=new int[2];
-    session.QueryUVMapSize(uv_size);
-    if (uv_size!=null) print("UVMapSize("+uv_size[0]+","+uv_size[1]+")\n");
+    print("Depth Size("+labelMap_Size[0]+","+labelMap_Size[1]+")\n");
+    labelMap=createImage(labelMap_Size[0], labelMap_Size[1], RGB);
   }
 }
 
@@ -43,12 +33,9 @@ void draw() {
   background(0);
 
   if (session.AcquireFrame(true)) {
-    session.QueryLabelMapAsImage(display);
+      if(session.QueryLabelMapAsImage(labelMap))
+        image(labelMap, 0, 0, 640, 480);
 
-    image(display, 0, 0, 640, 480);
-
-      //FINGER TRACKING
-    if (fingerTracking) { 
 
       //Hand 1, first hand detected, left or right specific
       PXCMGesture.GeoNode hand1Thumb=new PXCMGesture.GeoNode();
@@ -66,8 +53,7 @@ void draw() {
 
 
       //Scale tracked points
-    pushMatrix();
-    scale(2); //make everything twice as large
+      scale(2); //make everything twice as large
    
       //Drawing the fingertips on screen
       fill(255,0,0);
@@ -122,11 +108,7 @@ void draw() {
       if (session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_SECONDARY|PXCMGesture.GeoNode.LABEL_FINGER_PINKY, hand2Pinky)) {
         ellipse(hand2Pinky.positionImage.x, hand2Pinky.positionImage.y, 5, 5);
         text("   pinky", hand2Pinky.positionImage.x, hand2Pinky.positionImage.y);
-      }
-      
-      popMatrix();
-    }
-  
+      }  
 
     session.ReleaseFrame();
   }
