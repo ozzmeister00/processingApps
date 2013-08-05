@@ -1,6 +1,3 @@
-// to do:
-// add some kind of dampening so the color doesn't freak out and jitter
-
 import intel.pcsdk.*;
 
 float[] mHandPos = new float[4];
